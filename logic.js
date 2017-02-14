@@ -48,7 +48,7 @@ function Row(stitchesStart) {
 				divisor++;
 			}		
 		} else {
-			// TODO: need error to break everything.
+			// TODO: need error to break everything... and different error if things are falsy due to being undefined
 			console.log("ABORT! ABORT! cannot perform undetermined repeat!");
 		}
 
@@ -87,100 +87,3 @@ function Row(stitchesStart) {
 		AddStitch: AddStitch
 	};
 }
-
-// using a manager to add the stitches, rather than passing them in right away.
-// updates state
-function RowManager(row) {
-
-	function Repeat(stitch, repCount) {
-		var newStitch = Stitch(stitch.stitchesAdded * repCount,
-					  		   stitch.stitchesDropped * repCount,
-					  		   stitch.stitchCode + repCount)
-		debugger;
-		row.stitches.push(newStitch);
-	}
-
-	// TODO: use proper division and remainder functions
-	function UndeterminedRepeat(stitch) {
-		var divisor = 0;
-
-		if (row.stitchesRemaining >= stitch.stitchesDropped) {
-			while (row.stitchesRemaining >= stitch.stitchesDropped) {
-				row.stitchesRemaining -= stitch.stitchesDropped;
-				divisor++;
-			}		
-		} else {
-			// need error to break everything.
-			console.log("ABORT! ABORT! cannot perform undetermined repeat!");
-		}
-
-		var newCompoundStitch = Repeat(stitch, divisor);
-
-		row.stitches.push(newCompoundStitch);
-	}
-
-	function Sequence(stitch1, stitch2) {
-		var addedBySequence = stitch1.stitchesAdded + stitch2.stitchesAdded;
-		var droppedBySequence = stitch1.stitchesDropped + stitch2.stitchesDropped;
-
-		var newCompoundStitch = Stitch(addedBySequence, droppedBySequence);
-		debugger;
-		row.stitches.push(newCompoundStitch);
-	}
-
-	return {
-		Repeat: Repeat,
-		UndeterminedRepeat: UndeterminedRepeat,
-		Sequence: Sequence
-	}
-}
-
-// using a manager to add the stitches, rather than passing them in right away.
-function RowManager2(row) {
-
-	function Repeat(stitch, repCount) {
-		return Stitch(stitch.stitchesAdded * repCount,
-					  stitch.stitchesDropped * repCount);
-	}
-
-	// TODO: use proper division and remainder functions
-	function UndeterminedRepeat(stitch) {
-		var divisor = 0;
-		var stitchesRemaining = row.stitchesRemaining;
-
-		if (stitchesRemaining >= stitch.stitchesDropped) {
-			while (stitchesRemaining >= stitch.stitchesDropped) {
-				stitchesRemaining -= stitch.stitchesDropped;
-				divisor++;
-			}		
-		} else {
-			// need error to break everything.
-			console.log("ABORT! ABORT! cannot perform undetermined repeat!");
-		}
-
-		return Repeat(stitch, divisor);
-	}
-
-	function Sequence(stitch1, stitch2) {
-		return Stitch(stitch1.stitchesAdded + stitch2.stitchesAdded,
-					  stitch1.stitchesDropped + stitch2.stitchesDropped);
-	}
-
-	return {
-		Repeat: Repeat,
-		UndeterminedRepeat: UndeterminedRepeat,
-		Sequence: Sequence
-	}
-}
-
-
-
-
-
-// function Row2(stitchContent) {
-// 	return {
-// 		stitchesStart: stitchContent.stitchesDropped,
-// 		stitchesEnd: stitchContent.stitchesAdded,
-// 		stitches: stitchContent
-// 	};	
-// }
