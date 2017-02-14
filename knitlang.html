@@ -1,0 +1,99 @@
+<html>
+<head>
+	<title>My Special Knitting Language</title>
+	<script type="text/javascript" src="logic.js"></script>
+	<style type="text/css">
+		body {
+			/*font-family: 'Arsenal', sans-serif;*/
+			font-family: 'Slabo 27px', serif;
+			/*font-family: 'Playfair Display', serif;*/
+			font-size: 24px;
+			padding: 0px;
+			margin: 0px;
+		}
+
+		.container {
+			max-width: 700px;
+			margin-left: auto;
+			margin-right: auto;
+			background-color: white;
+			padding: 20px;
+		}
+
+		.hide { visibility: none }
+	</style>
+</head>
+<body>
+
+<div class="container">
+
+<p>
+A stitch is either a base stitch or a stitch operator. A stitch operator is some form of compound stitch; given some stitches as argument, it returns a new "stitch". Stitch operators include:
+
+<li>sequences, written stitch1, stitch2, ..., stitchn, meaning knit stitch1, then stitch2, then ..., then stitchn</li>
+<li>fixed repeat, written (stitch) number, meaning knit stitch number times</li>
+<li>undetermined repeat, written *stitch*, meaning knit stitch as many times as possible to the end of the row</li>
+</p>
+
+<div class="parser-tests hide">
+
+Test stitches and stitch sequences:
+
+<br>
+
+<span class="test">"K, P"</span>
+
+<br>
+
+<span class="test">"K2"</span>
+
+<br>
+
+<span class="test">"(K) 2"</span>
+
+<br>
+
+<span class="test">"K, (P, K) 3"</span>
+
+<br>
+
+<span class="test">"K, (P, (S, K)) 3"</span>
+
+</div>
+
+<div class="program-tests">
+Tests of functions:
+
+<br>
+
+var row1 = Row(5);
+
+<br>
+
+<span>row1.Sequence(knit, purl)</span>
+
+<br>
+
+<span>row1.Repeat(knit, 2)</span>
+
+<br>
+
+<span>row1.Sequence(row1man.Repeat(knit,2), purl)</span>
+
+<br>
+
+<span>row1.UndeterminedRepeat(knit)</span>
+
+<br>
+
+<span>row1.Sequence(row1.Repeat(row1.Sequence(knit, purl), 2), knit)</span>
+
+<br>
+
+<span>row1.Sequence(row1.Repeat(row1.Sequence(knit, row1.Repeat(purl, 3)), 2), knit)</span>
+</div>
+
+</div>
+
+</body>
+</html>
