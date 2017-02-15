@@ -1,3 +1,5 @@
+"use strict"
+
 // correctness options:
 //  1.  - compute stitch sequence as stitch, so content of row is a "stitch"
 //		- assume that number of stitches dropped is the correct amount for the start of the row
