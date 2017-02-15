@@ -69,17 +69,25 @@ function Row(stitchesStart) {
 		return newCompoundStitch;
 	}
 
+	// TODO: updating numeric properties is not currently working; could run a function to get these (update getter?) from the stitch array
 	function AddStitch(stitch) {
-		stitchesRemaining -= stitch.stitchesDropped;
-		stitchesEnd -+ stitch.stitchesAdded;
+		//stitchesRemaining -= stitch.stitchesDropped;
+		//stitchesEnd -+ stitch.stitchesAdded;
 		stitches.push(stitch);
 	}
 
+	function getStitchesEnd() {
+		return stitches.reduce(((acc,val) => acc + val.stitchesAdded), 0);
+	}
+
+	function getStitchesRemaining() {
+		return stitchesStart - getStitchesEnd();
+	}
 
 	return {
 		stitchesStart: stitchesStart,
-		stitchesRemaining: stitchesRemaining,
-		stitchesEnd: stitchesEnd,
+		stitchesRemaining: getStitchesRemaining,
+		stitchesEnd: getStitchesEnd,
 		stitches: stitches,
 		Repeat: Repeat,
 		UndeterminedRepeat: UndeterminedRepeat,
