@@ -24,11 +24,6 @@ var purltogether = (count) => Stitch(1, count,purl.stitchCode + count + "T");
 
 function Row(stitchesStart) {
 
-	var stitchesRemaining = stitchesStart;
-	var stitchesEnd = 0;
-	var stitches = [];
-
-
 	function Repeat(stitch, repCount, stitchCode = stitch.stitchCode + repCount) {
 		var newCompoundStitch = Stitch(stitch.stitchesAdded * repCount,
 					  		   stitch.stitchesDropped * repCount,
@@ -77,21 +72,38 @@ function Row(stitchesStart) {
 	}
 
 	function getStitchesEnd() {
-		return stitches.reduce(((acc,val) => acc + val.stitchesAdded), 0);
+	 	return stitches.reduce(((acc,val) => acc + val.stitchesAdded), 0);
 	}
 
-	function getStitchesRemaining() {
-		return stitchesStart - getStitchesEnd();
-	}
+	// function getStitchesRemaining() {
+	// 	return stitchesStart - getStitchesEnd();
+	// }
 
-	return {
-		stitchesStart: stitchesStart,
-		stitchesRemaining: getStitchesRemaining,
-		stitchesEnd: getStitchesEnd,
+	var stitches = [];
+
+	var PublicAPI = {
 		stitches: stitches,
 		Repeat: Repeat,
 		UndeterminedRepeat: UndeterminedRepeat,
 		Sequence: Sequence,
 		AddStitch: AddStitch
-	};
+	}
+
+	Object.defineProperty(PublicAPI, "stitchesStart", {
+		value: stitchesStart,
+		writable: false,
+		configurable: false
+	});
+
+	Object.defineProperty(PublicAPI, "stitchesEnd", {
+		get: () => stitches.reduce(((acc,val) => acc + val.stitchesAdded), 0),
+		enumerable: true
+	});
+
+	Object.defineProperty(PublicAPI, "stitchesRemaining", {
+		get: () => stitchesStart - getStitchesEnd(),
+		enumerable: true
+	});
+
+	return PublicAPI;
 }
