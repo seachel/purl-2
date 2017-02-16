@@ -8,7 +8,8 @@
 // need stitch codes
 // sequences and repeats are stitches too?
 
-function Stitch(stitchesAdded, stitchesDropped, stitchCode="no-code") {
+function Stitch(stitchesAdded, stitchesDropped, stitchCode="no-code")
+{
 	return {
 		stitchesAdded: stitchesAdded, // ensure this is a nat
 		stitchesDropped: stitchesDropped, // ensure this is a nat
@@ -24,11 +25,12 @@ var knittogether = (count) => Stitch(1, count,knit.stitchCode + count + "T");
 var purltogether = (count) => Stitch(1, count,purl.stitchCode + count + "T");
 
 
-function Row(stitchesStart) {
-
+function Row(stitchesStart)
+{
 	// public functions for constructing stitches and modifying row contents
 
-	function Repeat(stitch, repCount, stitchCode = stitch.stitchCode + repCount) {
+	function Repeat(stitch, repCount, stitchCode = stitch.stitchCode + repCount)
+	{
 		var newCompoundStitch = Stitch(stitch.stitchesAdded * repCount,
 					  		   stitch.stitchesDropped * repCount,
 					  		   stitchCode)
@@ -37,16 +39,21 @@ function Row(stitchesStart) {
 	}
 
 	// TODO: use proper division and remainder functions
-	function UndeterminedRepeat(stitch) {
+	function UndeterminedRepeat(stitch)
+	{
 		var divisor = 0;
 		var remainder = stitchesRemaining;
 
-		if (remainder >= stitch.stitchesDropped) {
-			while (remainder >= stitch.stitchesDropped) {
+		if (remainder >= stitch.stitchesDropped)
+		{
+			while (remainder >= stitch.stitchesDropped)
+			{
 				remainder -= stitch.stitchesDropped;
 				divisor++;
 			}		
-		} else {
+		}
+		else
+		{
 			// TODO: need error to break everything... and different error if things are falsy due to being undefined
 			console.log("ABORT! ABORT! cannot perform undetermined repeat!");
 		}
@@ -58,7 +65,8 @@ function Row(stitchesStart) {
 
 	// TODO: accept a list of arguments; use spread
 	// TODO: let instead of var?
-	function Sequence(stitch1, stitch2) {
+	function Sequence(stitch1, stitch2)
+	{
 		var addedBySequence = stitch1.stitchesAdded + stitch2.stitchesAdded;
 		var droppedBySequence = stitch1.stitchesDropped + stitch2.stitchesDropped;
 
@@ -69,7 +77,8 @@ function Row(stitchesStart) {
 		return newCompoundStitch;
 	}
 
-	function AddStitch(stitch) {
+	function AddStitch(stitch)
+	{
 		stitches.push(stitch);
 	}
 
@@ -77,18 +86,18 @@ function Row(stitchesStart) {
 
 	// private helper functions
 
-	function getTotalStitchesAdded() {
+	function getTotalStitchesAdded()
+	{
 	 	return stitches.reduce(
 	 		((partialResult, currentStitch) =>
-	 			 partialResult + currentStitch.stitchesAdded), 0
-	 	);
+	 			 partialResult + currentStitch.stitchesAdded), 0);
 	}
 
-	function getTotalStitchesDropped() {
+	function getTotalStitchesDropped()
+	{
 		return stitches.reduce(
 	 		((partialResult, currentStitch) =>
-	 			 partialResult + currentStitch.stitchesDropped), 0
-	 	);
+	 			 partialResult + currentStitch.stitchesDropped), 0);
 	}
 
 
@@ -104,22 +113,25 @@ function Row(stitchesStart) {
 		AddStitch: AddStitch
 	}
 
-	Object.defineProperty(PublicAPI, "stitchesStart", {
-		value: stitchesStart,
-		writable: false,
-		configurable: false,
-		enumerable: true
-	});
+	Object.defineProperty(PublicAPI, "stitchesStart",
+		{
+			value: stitchesStart,
+			writable: false,
+			configurable: false,
+			enumerable: true
+		});
 
-	Object.defineProperty(PublicAPI, "stitchesEnd", {
-		get: () => getTotalStitchesAdded(),
-		enumerable: true
-	});
+	Object.defineProperty(PublicAPI, "stitchesEnd",
+		{
+			get: () => getTotalStitchesAdded(),
+			enumerable: true
+		});
 
-	Object.defineProperty(PublicAPI, "stitchesRemaining", {
-		get: () => stitchesStart - getTotalStitchesDropped(),
-		enumerable: true
-	});
+	Object.defineProperty(PublicAPI, "stitchesRemaining",
+		{
+			get: () => stitchesStart - getTotalStitchesDropped(),
+			enumerable: true
+		});
 
 	return PublicAPI;
 }
@@ -128,11 +140,13 @@ function Pattern() {
 
 	var rows = [];
 
-	function CastOn(coValue) {
+	function CastOn(coValue)
+	{
 		castOnValue = coValue;
 	}
 
-	function AddRow(row) {
+	function AddRow(row)
+	{
 		//TODO: some check on row to make sure it is valid?
 		rows.push(row);
 	}
