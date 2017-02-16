@@ -26,6 +26,8 @@ var purltogether = (count) => Stitch(1, count,purl.stitchCode + count + "T");
 
 function Row(stitchesStart) {
 
+	// public functions for constructing stitches and modifying row contents
+
 	function Repeat(stitch, repCount, stitchCode = stitch.stitchCode + repCount) {
 		var newCompoundStitch = Stitch(stitch.stitchesAdded * repCount,
 					  		   stitch.stitchesDropped * repCount,
@@ -55,6 +57,7 @@ function Row(stitchesStart) {
 	}
 
 	// TODO: accept a list of arguments; use spread
+	// TODO: let instead of var?
 	function Sequence(stitch1, stitch2) {
 		var addedBySequence = stitch1.stitchesAdded + stitch2.stitchesAdded;
 		var droppedBySequence = stitch1.stitchesDropped + stitch2.stitchesDropped;
@@ -66,46 +69,66 @@ function Row(stitchesStart) {
 		return newCompoundStitch;
 	}
 
-	// TODO: updating numeric properties is not currently working; could run a function to get these (update getter?) from the stitch array
 	function AddStitch(stitch) {
-		//stitchesRemaining -= stitch.stitchesDropped;
-		//stitchesEnd -+ stitch.stitchesAdded;
 		stitches.push(stitch);
 	}
+
+
+
+	// private helper functions
 
 	function getStitchesEnd() {
 	 	return stitches.reduce(((acc,val) => acc + val.stitchesAdded), 0);
 	}
 
-	// function getStitchesRemaining() {
-	// 	return stitchesStart - getStitchesEnd();
-	// }
+
+	// returned object construction
 
 	var stitches = [];
 
 	var PublicAPI = {
 		stitches: stitches,
-		Repeat: Repeat,
+		Repeat: Repeat, // remove?
 		UndeterminedRepeat: UndeterminedRepeat,
-		Sequence: Sequence,
+		Sequence: Sequence, // remove?
 		AddStitch: AddStitch
 	}
 
 	Object.defineProperty(PublicAPI, "stitchesStart", {
 		value: stitchesStart,
 		writable: false,
-		configurable: false
+		configurable: false,
+		enumerable: true
 	});
 
 	Object.defineProperty(PublicAPI, "stitchesEnd", {
-		get: () => stitches.reduce(((acc,val) => acc + val.stitchesAdded), 0),
+		get: () => getStitchesEnd(),
 		enumerable: true
 	});
 
 	Object.defineProperty(PublicAPI, "stitchesRemaining", {
-		get: () => stitchesStart - getStitchesEnd(),
+		get: () => stitchesStart - getStitchesEnd(), // TODO: ERROR!! stitches dropped
 		enumerable: true
 	});
 
 	return PublicAPI;
+}
+
+function Pattern() {
+
+	var rows = [];
+
+	function CastOn(coValue) {
+		castOnValue = coValue;
+	}
+
+	function AddRow(row) {
+		//TODO: some check on row to make sure it is valid?
+		rows.push(row);
+	}
+
+	return {
+		castOnValue: 0,
+		rows: rows
+	}
 }
