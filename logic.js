@@ -8,6 +8,10 @@
 // need stitch codes
 // sequences and repeats are stitches too?
 
+// ----------
+// Data Model
+// ----------
+
 function Stitch(stitchesAdded, stitchesDropped, stitchCode="no-code")
 {
 	return {
@@ -155,4 +159,67 @@ function Pattern() {
 		castOnValue: 0,
 		rows: rows
 	}
+}
+
+// -------------
+// Program Logic
+// -------------
+
+// add row handler: add new row (need currentRow variable for now?) to data, and new control in html
+// stitch handlers: add stitch to current row (what if no current row?) in data, and add control to html
+// update "pattern" display after every button press? after every press of specific kind of button?
+
+
+function GetCastOnValue()
+{
+	// require that this input is numeric, and function returns a number
+	return Number(document.querySelector('#cast-on-input').innerHTML);
+}
+
+
+function AddStitchToModel(stitch){}
+
+function AddStitchToDisplay(stitch){}
+
+function AddStitch(stitch)
+{
+	AddStitchToModel(stitch);
+	AddStitchToDisplay(stitch);
+}
+
+
+function AddRowToModel(row){}
+
+function AddRowToDisplay(row){}
+
+function AddRow(row)
+{
+	AddRowToModel(row);
+	AddRowToDisplay(row);
+}
+
+
+document.onreadystatechange = function(e)
+{
+    if (document.readyState === 'complete')
+    {
+    	// Temp State for Testing
+		var currentRow = Row(GetCastOnValue());
+
+    	// hook up button press handlers
+    	document.querySelector('#btn_add-row')
+    		.addEventListener('click', () => AddRow(Row(GetCastOnValue())));
+
+    	document.querySelector('#btn_stitch-knit')
+    		.addEventListener('click', () => AddStitch(knit));
+
+    	document.querySelector('#btn_stitch-purl')
+    		.addEventListener('click', () => AddStitch(purl));
+
+    	document.querySelector('#btn_stitch-yarnover')
+    		.addEventListener('click', () => AddStitch(yarnover));
+
+    	document.querySelector('#btn_stitch-knit2together')
+    		.addEventListener('click', () => AddStitch(knittogether(2)));
+    }
 }
