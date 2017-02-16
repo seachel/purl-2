@@ -8,6 +8,8 @@
 
 <div class="container">
 
+<div class="information hide">
+
 <p>
 A stitch is either a base stitch or a stitch operator. A stitch operator is some form of compound stitch; given some stitches as argument, it returns a new "stitch". Stitch operators include:
 
@@ -15,6 +17,9 @@ A stitch is either a base stitch or a stitch operator. A stitch operator is some
 <li>fixed repeat, written (stitch) number, meaning knit stitch number times</li>
 <li>undetermined repeat, written *stitch*, meaning knit stitch as many times as possible to the end of the row</li>
 </p>
+
+</div>
+
 
 <div class="parser-tests hide">
 
@@ -94,6 +99,20 @@ var row1 = Row(5);
 </div>
 
 <div class="pattern-display">
+
+<div>
+	Row stitches: <span id="row-stitches"></span>
+</div>
+<div>
+	Stitches at start: <span id="row-stitches-start"></span>
+</div>
+<div>
+	Stitches remaining: <span id="row-stitches-remaining"></span>
+</div>
+<div>
+	Stitches at end: <span id="row-stitches-end"></span>
+</div>
+
 
 </div>
 

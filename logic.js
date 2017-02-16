@@ -176,33 +176,56 @@ function GetCastOnValue()
 	return Number(document.querySelector('#cast-on-input').innerHTML);
 }
 
+
+// Temp State:
+
 var currentRow = Row(0);
+
+
+// Update Model:
 
 function AddStitchToModel(stitch)
 {
 	currentRow.AddStitch(stitch);
 }
 
-function AddStitchToDisplay(stitch)
-{
-	
-}
-
-function AddStitch(stitch)
-{
-	AddStitchToModel(stitch);
-	AddStitchToDisplay(stitch);
-}
-
-
 function AddRowToModel(row)
 {
 	currentRow = row;
 }
 
+
+// Update Display:
+
+function AddStitchToDisplay(stitch)
+{
+	// TODO: once have better display, specific controls for each stitch
+	UpdateDisplay();
+}
+
 function AddRowToDisplay(row)
 {
+	// Initial display: print relevant row info
+	UpdateDisplay();
+}
 
+function UpdateDisplay()
+{
+	document.querySelector('#row-stitches').innerHTML =
+		currentRow.stitches.map(st => st.stitchCode).join();
+
+	document.querySelector('#row-stitches-start').innerHTML = currentRow.stitchesStart;
+	document.querySelector('#row-stitches-remaining').innerHTML = currentRow.stitchesRemaining;
+	document.querySelector('#row-stitches-end').innerHTML = currentRow.stitchesEnd;
+}
+
+
+// Event Handlers:
+
+function AddStitch(stitch)
+{
+	AddStitchToModel(stitch);
+	AddStitchToDisplay(stitch);
 }
 
 function AddRow(row)
