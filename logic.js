@@ -140,25 +140,36 @@ function Row(stitchesStart)
 	return PublicAPI;
 }
 
-function Pattern() {
+function Pattern(castOnValue) {
 
 	var rows = [];
 
-	function CastOn(coValue)
-	{
-		castOnValue = coValue;
-	}
-
-	function AddRow(row)
+	function AddNewRow()
 	{
 		//TODO: some check on row to make sure it is valid?
-		rows.push(row);
+		rows.push(Row(this.lastRowWidth));
 	}
 
-	return {
-		castOnValue: 0,
-		rows: rows
-	}
+	var PublicAPI = {
+		rows: rows,
+		AddNewRow: AddNewRow
+	};
+
+	Object.defineProperty(PublicAPI, "castOnValue",
+		{
+			value: castOnValue,
+			writable: false,
+			configurable: false,
+			enumerable: true
+		});
+
+	Object.defineProperty(PublicAPI, "lastRowWidth",
+		{
+			get: () => rows.length > 0 ? rows.last.stitchesEnd : castOnValue,
+			enumerable: true
+		});
+
+	return PublicAPI;
 }
 
 // -------------
