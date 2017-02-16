@@ -176,10 +176,17 @@ function GetCastOnValue()
 	return Number(document.querySelector('#cast-on-input').innerHTML);
 }
 
+var currentRow = Row(0);
 
-function AddStitchToModel(stitch){}
+function AddStitchToModel(stitch)
+{
+	currentRow.AddStitch(stitch);
+}
 
-function AddStitchToDisplay(stitch){}
+function AddStitchToDisplay(stitch)
+{
+	
+}
 
 function AddStitch(stitch)
 {
@@ -188,9 +195,15 @@ function AddStitch(stitch)
 }
 
 
-function AddRowToModel(row){}
+function AddRowToModel(row)
+{
+	currentRow = row;
+}
 
-function AddRowToDisplay(row){}
+function AddRowToDisplay(row)
+{
+
+}
 
 function AddRow(row)
 {
@@ -203,8 +216,8 @@ document.onreadystatechange = function(e)
 {
     if (document.readyState === 'complete')
     {
-    	// Temp State for Testing
-		var currentRow = Row(GetCastOnValue());
+    	// Initialize temp state for testing
+		currentRow = Row(GetCastOnValue());
 
     	// hook up button press handlers
     	document.querySelector('#btn_add-row')
