@@ -77,8 +77,18 @@ function Row(stitchesStart) {
 
 	// private helper functions
 
-	function getStitchesEnd() {
-	 	return stitches.reduce(((acc,val) => acc + val.stitchesAdded), 0);
+	function getTotalStitchesAdded() {
+	 	return stitches.reduce(
+	 		((partialResult, currentStitch) =>
+	 			 partialResult + currentStitch.stitchesAdded), 0
+	 	);
+	}
+
+	function getTotalStitchesDropped() {
+		return stitches.reduce(
+	 		((partialResult, currentStitch) =>
+	 			 partialResult + currentStitch.stitchesDropped), 0
+	 	);
 	}
 
 
@@ -102,12 +112,12 @@ function Row(stitchesStart) {
 	});
 
 	Object.defineProperty(PublicAPI, "stitchesEnd", {
-		get: () => getStitchesEnd(),
+		get: () => getTotalStitchesAdded(),
 		enumerable: true
 	});
 
 	Object.defineProperty(PublicAPI, "stitchesRemaining", {
-		get: () => stitchesStart - getStitchesEnd(), // TODO: ERROR!! stitches dropped
+		get: () => stitchesStart - getTotalStitchesDropped(),
 		enumerable: true
 	});
 
