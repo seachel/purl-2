@@ -226,17 +226,28 @@ function AddStitchToDisplay(stitch)
 function AddRowToDisplay(row)
 {
 	// Initial display: print relevant row info
+	var newNode = htmlForRow(row);
+
+	document.querySelector("#pattern-display").appendChild(newNode);
+
+	UpdateDisplay();
+}
+
+function AddPatternToDisplay(pattern)
+{
+	var newNode = document.createElement('div');
+	newNode.innerHTML = "Cast-on " + currentPattern.castOnValue;
+
+	document.querySelector("#pattern-display").appendChild(newNode);
+
 	UpdateDisplay();
 }
 
 function UpdateDisplay()
 {
 	// TEMP display, will change as UI changes
-	if (getCurrentRow() !== undefined)
+	if (currentRowIndex >= 0)
 	{
-		document.querySelector('#row-stitches').innerHTML =
-			getCurrentRow().stitches.map(st => st.stitchCode).join();
-
 		document.querySelector('#row-stitches-start').innerHTML = getCurrentRow().stitchesStart;
 		document.querySelector('#row-stitches-remaining').innerHTML = getCurrentRow().stitchesRemaining;
 		document.querySelector('#row-stitches-end').innerHTML = getCurrentRow().stitchesEnd;
@@ -250,6 +261,14 @@ function getCurrentRow()
 {
 	// TODO: lots of checks to prevent bugs
 	return currentPattern.rows[currentRowIndex];
+}
+
+function htmlForRow(row)
+{
+	var newNode = document.createElement('div');
+	newNode.innerHTML = "Row: " + row.stitches.join();
+	
+	return newNode;
 }
 
 
@@ -271,7 +290,7 @@ function UI_NewPattern(pattern)
 {
 	currentPattern = pattern; // currentPattern should never be null or undefined!! or at beginning?
 
-	UpdateDisplay();
+	AddPatternToDisplay();
 }
 
 
