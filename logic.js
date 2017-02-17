@@ -150,6 +150,11 @@ function Pattern(castOnValue) {
 		rows.push(Row(this.lastRowWidth));
 	}
 
+	function getLastRow()
+	{
+		return rows[rows.length - 1]
+	}
+
 	var PublicAPI = {
 		rows: rows,
 		AddNewRow: AddNewRow
@@ -165,7 +170,7 @@ function Pattern(castOnValue) {
 
 	Object.defineProperty(PublicAPI, "lastRowWidth",
 		{
-			get: () => rows.length > 0 ? rows.last.stitchesEnd : castOnValue,
+			get: () => rows.length > 0 ? getLastRow().stitchesEnd : castOnValue,
 			enumerable: true
 		});
 
@@ -188,21 +193,25 @@ function GetCastOnValue()
 }
 
 
+
 // Temp State:
 
-var currentRow = Row(0);
+var currentPattern = Pattern(0);
+var currentRowIndex = -1;
 
 
 // Update Model:
 
 function AddStitchToModel(stitch)
 {
-	currentRow.AddStitch(stitch);
+	// current stitch?
+	getCurrentRow().AddStitch(stitch);
 }
 
 function AddRowToModel(row)
 {
-	currentRow = row;
+	currentPattern.AddNewRow(row);
+	currentRowIndex++;
 }
 
 
@@ -222,27 +231,47 @@ function AddRowToDisplay(row)
 
 function UpdateDisplay()
 {
-	document.querySelector('#row-stitches').innerHTML =
-		currentRow.stitches.map(st => st.stitchCode).join();
+	// TEMP display, will change as UI changes
+	if (getCurrentRow() !== undefined)
+	{
+		document.querySelector('#row-stitches').innerHTML =
+			getCurrentRow().stitches.map(st => st.stitchCode).join();
 
-	document.querySelector('#row-stitches-start').innerHTML = currentRow.stitchesStart;
-	document.querySelector('#row-stitches-remaining').innerHTML = currentRow.stitchesRemaining;
-	document.querySelector('#row-stitches-end').innerHTML = currentRow.stitchesEnd;
+		document.querySelector('#row-stitches-start').innerHTML = getCurrentRow().stitchesStart;
+		document.querySelector('#row-stitches-remaining').innerHTML = getCurrentRow().stitchesRemaining;
+		document.querySelector('#row-stitches-end').innerHTML = getCurrentRow().stitchesEnd;
+	}
+}
+
+
+// Helper Functions
+
+function getCurrentRow()
+{
+	// TODO: lots of checks to prevent bugs
+	return currentPattern.rows[currentRowIndex];
 }
 
 
 // Event Handlers:
 
-function AddStitch(stitch)
+function UI_AddStitch(stitch)
 {
 	AddStitchToModel(stitch);
 	AddStitchToDisplay(stitch);
 }
 
-function AddRow(row)
+function UI_AddRow(row)
 {
 	AddRowToModel(row);
 	AddRowToDisplay(row);
+}
+
+function UI_NewPattern(pattern)
+{
+	currentPattern = pattern; // currentPattern should never be null or undefined!! or at beginning?
+
+	UpdateDisplay();
 }
 
 
@@ -251,22 +280,25 @@ document.onreadystatechange = function(e)
     if (document.readyState === 'complete')
     {
     	// Initialize temp state for testing
-		currentRow = Row(GetCastOnValue());
+    	//currentPattern = Pattern(GetCastOnValue());
 
     	// hook up button press handlers
+    	document.querySelector('#btn_new-pattern')
+    		.addEventListener('click', () => UI_NewPattern(Pattern(GetCastOnValue())));
+
     	document.querySelector('#btn_add-row')
-    		.addEventListener('click', () => AddRow(Row(GetCastOnValue())));
+    		.addEventListener('click', () => UI_AddRow(Row(currentPattern.lastRowWidth)));
 
     	document.querySelector('#btn_stitch-knit')
-    		.addEventListener('click', () => AddStitch(knit));
+    		.addEventListener('click', () => UI_AddStitch(knit));
 
     	document.querySelector('#btn_stitch-purl')
-    		.addEventListener('click', () => AddStitch(purl));
+    		.addEventListener('click', () => UI_AddStitch(purl));
 
     	document.querySelector('#btn_stitch-yarnover')
-    		.addEventListener('click', () => AddStitch(yarnover));
+    		.addEventListener('click', () => UI_AddStitch(yarnover));
 
     	document.querySelector('#btn_stitch-knit2together')
-    		.addEventListener('click', () => AddStitch(knittogether(2)));
+    		.addEventListener('click', () => UI_AddStitch(knittogether(2)));
     }
 }
