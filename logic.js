@@ -189,7 +189,7 @@ function GetCastOnValue()
 
 // Temp State:
 
-var currentPattern = Pattern(0);
+var currentPattern;
 var currentRowIndex = -1;
 
 // -------------
@@ -214,9 +214,6 @@ function AddRowToModel(row)
 
 function AddStitchToDisplay(stitch)
 {
-	// TODO: once have better display, specific controls for each stitch
-	UpdateDisplay();
-
 	// Update current row
 	// Steps: find node for current row, append stitch html
 	// classes for html node?
@@ -225,6 +222,8 @@ function AddStitchToDisplay(stitch)
 	var newStitchNode = htmlNodeForStitch(stitch);
 
 	currentRowNode.appendChild(newStitchNode);
+
+	UpdateDisplay();
 }
 
 function AddRowToDisplay(row)
@@ -237,13 +236,26 @@ function AddRowToDisplay(row)
 	UpdateDisplay();
 }
 
-function AddPatternToDisplay(pattern)
+function AddCurrentPatternToDisplay()
 {
-	var newNode = htmlNodeForPattern(pattern);
+	var newNode = htmlNodeForCurrentPattern();
 
 	document.querySelector("#pattern-display").appendChild(newNode);
 
 	UpdateDisplay();
+}
+
+function ClearPatternDisplay()
+{
+	var patternDisplayNode = document.querySelector("#pattern-display");
+
+	while (patternDisplayNode.firstChild)
+	{
+		patternDisplayNode.removeChild(patternDisplayNode.firstChild);
+	}
+
+	currentPattern = undefined;
+	currentRowIndex = -1;
 }
 
 function UpdateDisplay()
@@ -266,6 +278,11 @@ function UpdateDisplay()
 function getCurrentRow()
 {
 	// TODO: lots of checks to prevent bugs
+	if (currentRowIndex > currentPattern.rows.length - 1)
+	{
+		// TODO: error!
+	}
+
 	return currentPattern.rows[currentRowIndex];
 }
 
@@ -292,7 +309,7 @@ function htmlNodeForRow(row)
 	return newNode;
 }
 
-function htmlNodeForPattern(pattern)
+function htmlNodeForCurrentPattern()
 {
 	var newNode = document.createElement('div');
 	newNode.classList.add('pattern');
@@ -308,8 +325,15 @@ function htmlNodeForPattern(pattern)
 
 function UI_AddStitch(stitch)
 {
-	AddStitchToModel(stitch);
-	AddStitchToDisplay(stitch);
+	if (getCurrentRow())
+	{
+		AddStitchToModel(stitch);
+		AddStitchToDisplay(stitch);
+	}
+	else
+	{
+		// TODO: thow error; can't add a stitch
+	}
 }
 
 function UI_AddNewRow()
@@ -322,11 +346,13 @@ function UI_AddNewRow()
 
 function UI_NewPattern()
 {
+	ClearPatternDisplay();
+
 	var newPattern = Pattern(GetCastOnValue());
-	
+
 	currentPattern = newPattern; // currentPattern should never be null or undefined!! or at beginning?
 
-	AddPatternToDisplay();
+	AddCurrentPatternToDisplay();
 }
 
 
