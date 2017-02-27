@@ -1,0 +1,50 @@
+<<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.1.1.css">
+	<script src="https://code.jquery.com/qunit/qunit-2.1.1.js"></script>
+	<script src="logic.js"></script>
+	<script>
+	// Test stitches added and dropped for base stitches
+	QUnit.test("Base Stitch Test",
+		function(assert)
+		{
+			var maxCheck = 1000;
+
+			assert.deepEqual(knit.stitchesAdded, 1);
+			assert.deepEqual(knit.stitchesDropped, 1);
+			assert.deepEqual(knit.stitchCode, "K");
+			assert.deepEqual(purl.stitchesAdded, 1);
+			assert.deepEqual(purl.stitchesDropped, 1);
+			assert.deepEqual(purl.stitchCode, "P");
+			assert.deepEqual(slip.stitchesAdded, 1);
+			assert.deepEqual(slip.stitchesDropped, 1);
+			assert.deepEqual(slip.stitchCode, "S");
+			assert.deepEqual(yarnover.stitchesAdded, 1);
+			assert.deepEqual(yarnover.stitchesDropped, 0);
+			assert.deepEqual(yarnover.stitchCode, "YO");
+			
+			for (let n = 0; n <= maxCheck; n++)
+			{
+				var knittogether_n = knittogether(n);
+				assert.deepEqual(knittogether_n.stitchesAdded, 1);
+				assert.deepEqual(knittogether_n.stitchesDropped, n);
+				assert.deepEqual(knittogether_n.stitchCode, "K" + n + "T");
+
+				var purltogether_n = purltogether(n);
+				assert.deepEqual(purltogether_n.stitchesAdded, 1);
+				assert.deepEqual(purltogether_n.stitchesDropped, n);
+				assert.deepEqual(purltogether_n.stitchCode, "P" + n + "T");
+			}	
+			// TODO: how to say "forall" to test knittogether and purltogether?
+		});
+
+	// Test compound stitches for all possible base stitches... way to say forall?
+	</script>
+</head>
+<body>
+
+<div id="qunit"></div>
+
+</body>
+</html>
