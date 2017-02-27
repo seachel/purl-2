@@ -8,9 +8,11 @@
 // need stitch codes
 // sequences and repeats are stitches too?
 
-// ----------
+// ------------------------------------------------------
+// ------------------------------------------------------
 // Data Model
-// ----------
+// ------------------------------------------------------
+// ------------------------------------------------------
 
 function Stitch(stitchesAdded, stitchesDropped, stitchCode="no-code")
 {
@@ -139,11 +141,17 @@ function Row(stitchesStart)
 function Pattern(castOnValue) {
 
 	var rows = [];
+	var errors = [];
 
 	function AddNewRow()
 	{
 		//TODO: some check on row to make sure it is valid?
 		rows.push(Row(this.lastRowWidth));
+	}
+
+	function AddError(error)
+	{
+		errors.push(error);
 	}
 
 	function getLastRow()
@@ -153,7 +161,9 @@ function Pattern(castOnValue) {
 
 	var PublicAPI = {
 		rows: rows,
-		AddNewRow: AddNewRow
+		AddNewRow: AddNewRow,
+		errors: errors,
+		AddError: AddError
 	};
 
 	Object.defineProperty(PublicAPI, "castOnValue",
@@ -173,11 +183,27 @@ function Pattern(castOnValue) {
 	return PublicAPI;
 }
 
-//-------------------
-// ------------------
+
+function Error(message)
+{
+	return {
+		message: message,
+	}
+}
+
+function RowError(message, rowIndex = currentRowIndex)
+{
+	var errorMessage = "Error in row " + rowIndex + ": " + message;
+
+	return Error(errorMessage);
+}
+
+
+// ------------------------------------------------------
+// ------------------------------------------------------
 // Program Logic
-// ------------------
-// ------------------
+// ------------------------------------------------------
+// ------------------------------------------------------
 
 function GetCastOnValue()
 {
@@ -205,7 +231,6 @@ function AddStitchToModel(stitch)
 function AddRowToModel(row)
 {
 	currentPattern.AddNewRow(row);
-	currentRowIndex++;
 }
 
 // ---------------
@@ -280,7 +305,7 @@ function getCurrentRow()
 	// TODO: lots of checks to prevent bugs
 	if (currentRowIndex > currentPattern.rows.length - 1)
 	{
-		// TODO: error!
+		// TODO: program error, not pattern error!
 	}
 
 	return currentPattern.rows[currentRowIndex];
@@ -318,6 +343,62 @@ function htmlNodeForCurrentPattern()
 	return newNode;
 }
 
+// --------------
+// Error Handling
+// --------------
+
+// TODO:
+// - adding an error to the model
+// - adding an error to the display
+// - function to write HTML element
+
+function AddError(errorMessage)
+{
+	var newError = Error(errorMessage);
+
+	AddErrorToModel(newError);
+	AddErrorToDisplay(newError);
+}
+
+function AddRowError(errorMessage)
+{
+	var newError = RowError(errorMessage, currentRowIndex + 1);
+
+	AddErrorToModel(newError);
+	AddErrorToDisplay(newError);
+}
+
+function AddErrorToModel(error)
+{
+	currentPattern.AddError(error);
+}
+
+function AddErrorToDisplay(error)
+{
+	var newNode = htmlNodeForError(error);
+
+	document.querySelector("#pattern-errors").appendChild(newNode);
+}
+
+function htmlNodeForError(error)
+{
+	var newNode = document.createElement('div');
+	newNode.classList.add('error');
+	newNode.innerHTML = error.message;
+
+	return newNode;
+}
+
+function ClearErrorDisplay()
+{
+	var errorDisplayNode = document.querySelector("#pattern-errors");
+
+	while (errorDisplayNode.firstChild)
+	{
+		errorDisplayNode.removeChild(errorDisplayNode.firstChild);
+	}
+}
+
 
 // ---------------
 // Event Handlers:
@@ -325,20 +406,31 @@ function htmlNodeForCurrentPattern()
 
 function UI_AddStitch(stitch)
 {
-	if (getCurrentRow())
+	if (currentRowIndex >= 0)
 	{
-		AddStitchToModel(stitch);
-		AddStitchToDisplay(stitch);
+		if (stitch.stitchesDropped <= getCurrentRow().stitchesRemaining)
+		{
+			AddStitchToModel(stitch);
+			AddStitchToDisplay(stitch);
+		}
+		else
+		{
+			var errorMessage = "Can't add stitch " + stitch.stitchCode + " to row; need " + stitch.stitchesDropped + " stitches but only " + getCurrentRow().stitchesRemaining + " stitches remaining.";
+
+			AddRowError(errorMessage);
+		}
 	}
 	else
 	{
-		// TODO: thow error; can't add a stitch
+		AddError("No rows in pattern; can't add stitch " + stitch + " to current row.");
 	}
 }
 
 function UI_AddNewRow()
 {
 	var newRow = Row(currentPattern.lastRowWidth);
+
+	currentRowIndex++;
 
 	AddRowToModel(newRow);
 	AddRowToDisplay(newRow);
@@ -347,10 +439,12 @@ function UI_AddNewRow()
 function UI_NewPattern()
 {
 	ClearPatternDisplay();
+	ClearErrorDisplay();
 
 	var newPattern = Pattern(GetCastOnValue());
 
 	currentPattern = newPattern; // currentPattern should never be null or undefined!! or at beginning?
+	currentRowIndex = -1;
 
 	AddCurrentPatternToDisplay();
 }
