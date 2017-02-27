@@ -29,19 +29,33 @@ var knittogether = (count) => Stitch(1, count,knit.stitchCode + count + "T");
 var purltogether = (count) => Stitch(1, count,purl.stitchCode + count + "T");
 
 
+
+function Repeat(stitch, repCount, stitchCode = stitch.stitchCode + repCount)
+{
+	var newCompoundStitch = Stitch(stitch.stitchesAdded * repCount,
+				  		   stitch.stitchesDropped * repCount,
+				  		   stitchCode)
+
+	return newCompoundStitch;
+}
+
+// TODO: accept a list of arguments; use spread
+// TODO: let instead of var?
+function Sequence(stitch1, stitch2)
+{
+	var addedBySequence = stitch1.stitchesAdded + stitch2.stitchesAdded;
+	var droppedBySequence = stitch1.stitchesDropped + stitch2.stitchesDropped;
+
+	var newCompoundStitch = Stitch(addedBySequence,
+								   droppedBySequence,
+								   "(" + stitch1.stitchCode + ", " + stitch2.stitchCode + ")");
+
+	return newCompoundStitch;
+}
+
+
 function Row(stitchesStart)
 {
-	// public functions for constructing stitches and modifying row contents
-
-	function Repeat(stitch, repCount, stitchCode = stitch.stitchCode + repCount)
-	{
-		var newCompoundStitch = Stitch(stitch.stitchesAdded * repCount,
-					  		   stitch.stitchesDropped * repCount,
-					  		   stitchCode)
-
-		return newCompoundStitch;
-	}
-
 	// TODO: use proper division and remainder functions
 	function UndeterminedRepeat(stitch)
 	{
@@ -67,26 +81,10 @@ function Row(stitchesStart)
 		return newCompoundStitch;
 	}
 
-	// TODO: accept a list of arguments; use spread
-	// TODO: let instead of var?
-	function Sequence(stitch1, stitch2)
-	{
-		var addedBySequence = stitch1.stitchesAdded + stitch2.stitchesAdded;
-		var droppedBySequence = stitch1.stitchesDropped + stitch2.stitchesDropped;
-
-		var newCompoundStitch = Stitch(addedBySequence,
-									   droppedBySequence,
-									   "(" + stitch1.stitchCode + ", " + stitch2.stitchCode + ")");
-
-		return newCompoundStitch;
-	}
-
 	function AddStitch(stitch)
 	{
 		stitches.push(stitch);
 	}
-
-
 
 	// private helper functions
 
@@ -110,10 +108,8 @@ function Row(stitchesStart)
 	var stitches = [];
 
 	var PublicAPI = {
-		stitches: stitches,
-		Repeat: Repeat, // remove?
 		UndeterminedRepeat: UndeterminedRepeat,
-		Sequence: Sequence, // remove?
+		stitches: stitches,
 		AddStitch: AddStitch
 	}
 

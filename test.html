@@ -1,4 +1,4 @@
-<<html>
+<html>
 <head>
 	<title></title>
 	<link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.1.1.css">
@@ -9,7 +9,7 @@
 	QUnit.test("Base Stitch Test",
 		function(assert)
 		{
-			var maxCheck = 1000;
+			var maxCheck = 10;
 
 			assert.deepEqual(knit.stitchesAdded, 1);
 			assert.deepEqual(knit.stitchesDropped, 1);
@@ -37,6 +37,62 @@
 				assert.deepEqual(purltogether_n.stitchCode, "P" + n + "T");
 			}	
 			// TODO: how to say "forall" to test knittogether and purltogether?
+		});
+
+	QUnit.test("Repeat Stitches Test",
+		function(assert)
+		{
+			var maxAdded = 10;
+			var maxDropped = 10;
+			var maxRepeat = 15;
+
+			// need to check all numbers and all stitch codes?
+			for (let testAdded = 0; testAdded <= maxAdded; testAdded++)
+			{
+				for (let testDropped = 0; testDropped <= maxDropped; testDropped++)
+				{
+					var testStitch = Stitch(testAdded, testDropped);
+					
+					for (let repeatCount = 0; repeatCount <= maxRepeat; repeatCount++)
+					{
+						var repeatStitch = Repeat(testStitch, repeatCount);
+			
+						assert.deepEqual(repeatStitch.stitchesAdded, testStitch.stitchesAdded * repeatCount);
+						assert.deepEqual(repeatStitch.stitchesDropped, testStitch.stitchesDropped * repeatCount);
+						assert.deepEqual(repeatStitch.stitchCode, testStitch.stitchCode + repeatCount);
+					}
+				}
+			}
+		});
+
+	QUnit.test("Stitch Sequence Test",
+		function(assert)
+		{
+			var maxAddedStitch1 = 10;
+			var maxDroppedStitch1 = 10;
+			var maxAddedStitch2 = 10;
+			var maxDroppedStitch2 = 10;
+
+			var stitchesAdded1 = maxAddedStitch1;
+			var stitchesDropped1 = maxDroppedStitch1;
+			var stitchCode1 = "code1"; //TODO: go through all codes?
+
+			var stitch1 = Stitch(stitchesAdded1, stitchesDropped1, stitchCode1);
+
+			var stitchesAdded2 = maxAddedStitch2;
+			var stitchesDropped2 = maxDroppedStitch2;
+			var stitchCode2 = "code2"; //TODO: go through all codes?
+
+			var stitch2 = Stitch(stitchesAdded2, stitchesDropped2, stitchCode2);
+
+			var stitchSequence = Sequence(stitch1, stitch2);
+			
+			assert.deepEqual(stitchSequence.stitchesAdded,
+							stitch1.stitchesAdded + stitch2.stitchesAdded);
+			assert.deepEqual(stitchSequence.stitchesDropped,
+							stitch1.stitchesDropped + stitch2.stitchesDropped);
+			assert.deepEqual(stitchSequence.stitchCode,
+							"(" + stitch1.stitchCode + ", " + stitch2.stitchCode + ")");
 		});
 
 	// Test compound stitches for all possible base stitches... way to say forall?
