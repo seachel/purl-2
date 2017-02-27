@@ -393,9 +393,11 @@ function ClearErrorDisplay()
 {
 	var errorDisplayNode = document.querySelector("#pattern-errors");
 
-	while (errorDisplayNode.firstChild)
+	var errorNodes = document.querySelectorAll("#pattern-errors .error");
+
+	if (errorNodes)
 	{
-		errorDisplayNode.removeChild(errorDisplayNode.firstChild);
+		errorNodes.forEach(errorNode => errorDisplayNode.removeChild(errorNode));
 	}
 }
 
