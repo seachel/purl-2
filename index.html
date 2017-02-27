@@ -1,8 +1,19 @@
 <html>
 <head>
-	<title>My Special Knitting Language</title>
+	<title>Purl, a knitting pattern designer by Chelsea Battell</title>
 	<script type="text/javascript" src="logic.js"></script>
+	<script type="text/javascript" src="model.js"></script>
 	<link rel="stylesheet" type="text/css" href="style.css">
+	<link href="https://fonts.googleapis.com/css?family=Lobster+Two|Slabo+27px" rel="stylesheet">
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+	  ga('create', 'UA-91001708-1', 'auto');
+	  ga('send', 'pageview');
+	</script>
 </head>
 <body>
 
@@ -20,72 +31,6 @@ A stitch is either a base stitch or a stitch operator. A stitch operator is some
 
 </div>
 
-
-<div class="parser-tests hide">
-
-Test stitches and stitch sequences:
-
-<br>
-
-<span class="test">"K, P"</span>
-
-<br>
-
-<span class="test">"K2"</span>
-
-<br>
-
-<span class="test">"(K) 2"</span>
-
-<br>
-
-<span class="test">"K, (P, K) 3"</span>
-
-<br>
-
-<span class="test">"K, (P, (S, K)) 3"</span>
-
-</div>
-
-<div class="program-tests hide">
-Tests of functions:
-
-<br>
-
-var row1 = Row(5);
-
-<br>
-
-<span>row1.Sequence(knit, purl)</span>
-
-<br>
-
-<span>row1.Repeat(knit, 2)</span>
-
-<br>
-
-<span>row1.Sequence(row1.Repeat(knit,2), purl)</span>
-
-<br>
-
-<span>row1.UndeterminedRepeat(knit)</span>
-
-<br>
-
-<span>row1.Sequence(row1.Repeat(row1.Sequence(knit, purl), 2), knit)</span>
-
-<br>
-
-<span>row1.Sequence(row1.Repeat(row1.Sequence(knit, row1.Repeat(purl, 3)), 2), knit)</span>
-
-<br>
-
-<span>row1.AddStitch(row1.Sequence(knit, purl))</span>
-
-<br>
-
-<span>row1.AddStitch(knit)</span>
-</div>
 
 <div class="pattern-controls">
 
