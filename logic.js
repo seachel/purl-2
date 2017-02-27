@@ -177,14 +177,11 @@ function Pattern(castOnValue) {
 	return PublicAPI;
 }
 
-// -------------
+//-------------------
+// ------------------
 // Program Logic
-// -------------
-
-// add row handler: add new row (need currentRow variable for now?) to data, and new control in html
-// stitch handlers: add stitch to current row (what if no current row?) in data, and add control to html
-// update "pattern" display after every button press? after every press of specific kind of button?
-
+// ------------------
+// ------------------
 
 function GetCastOnValue()
 {
@@ -199,8 +196,9 @@ function GetCastOnValue()
 var currentPattern = Pattern(0);
 var currentRowIndex = -1;
 
-
+// -------------
 // Update Model:
+// -------------
 
 function AddStitchToModel(stitch)
 {
@@ -214,19 +212,29 @@ function AddRowToModel(row)
 	currentRowIndex++;
 }
 
-
+// ---------------
 // Update Display:
+// ---------------
 
 function AddStitchToDisplay(stitch)
 {
 	// TODO: once have better display, specific controls for each stitch
 	UpdateDisplay();
+
+	// Update current row
+	// Steps: find node for current row, append stitch html
+	// classes for html node?
+	var currentRowNode = document.querySelector('#row-' + currentRowIndex);
+
+	var newStitchNode = htmlNodeForStitch(stitch);
+
+	currentRowNode.appendChild(newStitchNode);
 }
 
 function AddRowToDisplay(row)
 {
 	// Initial display: print relevant row info
-	var newNode = htmlForRow(row);
+	var newNode = htmlNodeForRow(row);
 
 	document.querySelector("#pattern-display").appendChild(newNode);
 
@@ -235,8 +243,7 @@ function AddRowToDisplay(row)
 
 function AddPatternToDisplay(pattern)
 {
-	var newNode = document.createElement('div');
-	newNode.innerHTML = "Cast-on " + currentPattern.castOnValue;
+	var newNode = htmlNodeForPattern(pattern);
 
 	document.querySelector("#pattern-display").appendChild(newNode);
 
@@ -248,14 +255,17 @@ function UpdateDisplay()
 	// TEMP display, will change as UI changes
 	if (currentRowIndex >= 0)
 	{
-		document.querySelector('#row-stitches-start').innerHTML = getCurrentRow().stitchesStart;
-		document.querySelector('#row-stitches-remaining').innerHTML = getCurrentRow().stitchesRemaining;
-		document.querySelector('#row-stitches-end').innerHTML = getCurrentRow().stitchesEnd;
+		var currentRow = getCurrentRow();
+
+		document.querySelector('#row-stitches-start').innerHTML = currentRow.stitchesStart;
+		document.querySelector('#row-stitches-remaining').innerHTML = currentRow.stitchesRemaining;
+		document.querySelector('#row-stitches-end').innerHTML = currentRow.stitchesEnd;
 	}
 }
 
-
+// ----------------
 // Helper Functions
+// ----------------
 
 function getCurrentRow()
 {
@@ -263,16 +273,42 @@ function getCurrentRow()
 	return currentPattern.rows[currentRowIndex];
 }
 
-function htmlForRow(row)
+function htmlNodeForStitch(stitch)
+{
+	var newNode = document.createElement('span');
+	newNode.classList.add('stitch');
+
+	// add comma separator if not first stitch
+	var previousStitchCount = document.querySelectorAll('#row-' + currentRowIndex + ' .stitch').length;
+
+	newNode.innerHTML = (previousStitchCount > 0 ? ", " : "") + stitch.stitchCode;
+
+	return newNode;
+}
+
+function htmlNodeForRow(row)
 {
 	var newNode = document.createElement('div');
-	newNode.innerHTML = "Row: " + row.stitches.join();
+	newNode.id = "row-" + currentRowIndex;
+	newNode.classList.add('row');
+	newNode.innerHTML = "Row " + (currentRowIndex + 1) + ": " + row.stitches.join();
 	
 	return newNode;
 }
 
+function htmlNodeForPattern(pattern)
+{
+	var newNode = document.createElement('div');
+	newNode.classList.add('pattern');
+	newNode.innerHTML = "Cast-on " + currentPattern.castOnValue;
 
+	return newNode;
+}
+
+
+// ---------------
 // Event Handlers:
+// ---------------
 
 function UI_AddStitch(stitch)
 {
@@ -280,44 +316,75 @@ function UI_AddStitch(stitch)
 	AddStitchToDisplay(stitch);
 }
 
-function UI_AddRow(row)
+function UI_AddNewRow()
 {
-	AddRowToModel(row);
-	AddRowToDisplay(row);
+	var newRow = Row(currentPattern.lastRowWidth);
+
+	AddRowToModel(newRow);
+	AddRowToDisplay(newRow);
 }
 
-function UI_NewPattern(pattern)
+function UI_NewPattern()
 {
-	currentPattern = pattern; // currentPattern should never be null or undefined!! or at beginning?
+	var newPattern = Pattern(GetCastOnValue());
+	
+	currentPattern = newPattern; // currentPattern should never be null or undefined!! or at beginning?
 
 	AddPatternToDisplay();
 }
 
 
+// TODO: how to test when elements from original page are null here?
 document.onreadystatechange = function(e)
 {
     if (document.readyState === 'complete')
     {
+    	// TODO: different behaviour for different pages?
+
     	// Initialize temp state for testing
     	//currentPattern = Pattern(GetCastOnValue());
 
+    	var btn_newPattern = document.querySelector('#btn_new-pattern');
+
     	// hook up button press handlers
-    	document.querySelector('#btn_new-pattern')
-    		.addEventListener('click', () => UI_NewPattern(Pattern(GetCastOnValue())));
+    	if (btn_newPattern)
+    	{
+    		btn_newPattern.addEventListener('click', UI_NewPattern);
+    	}
 
-    	document.querySelector('#btn_add-row')
-    		.addEventListener('click', () => UI_AddRow(Row(currentPattern.lastRowWidth)));
+    	var btn_addRow = document.querySelector('#btn_add-row');
 
-    	document.querySelector('#btn_stitch-knit')
-    		.addEventListener('click', () => UI_AddStitch(knit));
+    	if (btn_addRow)
+    	{
+    		btn_addRow.addEventListener('click', UI_AddNewRow);
+    	}
 
-    	document.querySelector('#btn_stitch-purl')
-    		.addEventListener('click', () => UI_AddStitch(purl));
+    	var btn_stitchKnit = document.querySelector('#btn_stitch-knit');
 
-    	document.querySelector('#btn_stitch-yarnover')
-    		.addEventListener('click', () => UI_AddStitch(yarnover));
+    	if (btn_stitchKnit)
+    	{
+    		btn_stitchKnit.addEventListener('click', () => UI_AddStitch(knit));
+		}
 
-    	document.querySelector('#btn_stitch-knit2together')
-    		.addEventListener('click', () => UI_AddStitch(knittogether(2)));
-    }
+		var btn_stitchPurl = document.querySelector('#btn_stitch-purl');
+
+		if (btn_stitchPurl)
+		{
+			btn_stitchPurl.addEventListener('click', () => UI_AddStitch(purl));
+		}
+
+		var btn_stitchYarnover = document.querySelector('#btn_stitch-yarnover');
+
+		if (btn_stitchYarnover)
+		{
+			btn_stitchYarnover.addEventListener('click', () => UI_AddStitch(yarnover));
+		}
+
+		var btn_stitchKnit2together = document.querySelector('#btn_stitch-knit2together');
+
+		if (btn_stitchKnit2together)
+		{
+			btn_stitchKnit2together.addEventListener('click', () => UI_AddStitch(knittogether(2)));
+		}
+	}
 }
