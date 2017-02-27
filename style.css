@@ -1,4 +1,5 @@
-body {
+body
+{
 	/*font-family: 'Arsenal', sans-serif;*/
 	font-family: 'Slabo 27px', serif;
 	/*font-family: 'Playfair Display', serif;*/
@@ -7,7 +8,13 @@ body {
 	margin: 0px;
 }
 
-.container {
+.panel
+{
+	padding: 10px 0;
+}
+
+.container
+{
 	max-width: 800px;
 	margin-left: auto;
 	margin-right: auto;
