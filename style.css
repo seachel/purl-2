@@ -1,3 +1,7 @@
+/*------------*/
+/* Base Rules */
+/*------------*/
+
 body
 {
 	/*font-family: 'Arsenal', sans-serif;*/
@@ -8,18 +12,40 @@ body
 	margin: 0px;
 }
 
-.panel
+
+/*--------------*/
+/* Layout Rules */
+/*--------------*/
+
+#header
+{
+	padding: 10px 0;
+	font-family: 'Lobster Two', cursive;
+	font-weight: normal;
+	text-align: center;
+}
+
+#main-content
+{
+	max-width: 800px;
+	margin: auto;
+	font-family: 'Slabo 27px', serif;
+	font-size: 24px;
+}
+
+.l-panel
 {
 	padding: 10px 0;
 }
 
-.container
-{
-	max-width: 800px;
-	margin-left: auto;
-	margin-right: auto;
-	background-color: white;
-	padding: 20px;
-}
 
-.hide { display: none; }
+/*--------------*/
+/* Module Rules */
+/*--------------*/
+
+
+/*-------------*/
+/* State Rules */
+/*-------------*/
+
+.is-hidden { display: none; }

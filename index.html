@@ -16,9 +16,11 @@
 </head>
 <body>
 
-<div class="container">
+<div id="header"></div>
 
-<div class="information hide">
+<div id="main-content">
+
+<div class="l-information is-hidden">
 
 <p>
 A stitch is either a base stitch or a stitch operator. A stitch operator is some form of compound stitch; given some stitches as argument, it returns a new "stitch". Stitch operators include:
@@ -31,7 +33,7 @@ A stitch is either a base stitch or a stitch operator. A stitch operator is some
 </div>
 
 
-<div class="pattern-controls">
+<div id="pattern-controls">
 
 <div>Cast-on value: <span id="cast-on-input" contenteditable="true">6</span></div>
 
@@ -43,7 +45,8 @@ A stitch is either a base stitch or a stitch operator. A stitch operator is some
 <input id="btn_stitch-knit2together" type="button" value="K2T">
 </div>
 
-<div class="l-pattern-display">
+
+<div id="pattern-data">
 
 <div>
 	Current row data:
@@ -60,21 +63,21 @@ A stitch is either a base stitch or a stitch operator. A stitch operator is some
 
 <br>
 
-<div id="pattern-display" class="panel">
-
-</div>
-
-<div id="pattern-errors" class="panel">
+<div id="pattern-display" class="l-panel">
 
 </div>
 
 
+<div id="pattern-errors" class="l-panel">
+
+</div>
+
 
 
 
 </div>
-
 </div>
+
 
 </body>
 </html>
