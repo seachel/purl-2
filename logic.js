@@ -246,6 +246,13 @@ function AddStitchToDisplay(stitch)
 
 	var newStitchNode = htmlNodeForStitch(stitch);
 
+	var previousStitchCount = document.querySelectorAll('#row-' + currentRowIndex + ' .stitch').length;
+
+	if (previousStitchCount > 0)
+	{
+		currentRowNode.append(",");
+	}
+
 	currentRowNode.appendChild(newStitchNode);
 
 	UpdateDisplay();
@@ -316,10 +323,7 @@ function htmlNodeForStitch(stitch)
 	var newNode = document.createElement('span');
 	newNode.classList.add('stitch');
 
-	// add comma separator if not first stitch
-	var previousStitchCount = document.querySelectorAll('#row-' + currentRowIndex + ' .stitch').length;
-
-	newNode.innerHTML = (previousStitchCount > 0 ? ", " : "") + stitch.stitchCode;
+	newNode.innerHTML = stitch.stitchCode;
 
 	return newNode;
 }
