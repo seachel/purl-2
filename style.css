@@ -43,6 +43,29 @@ body
 /* Module Rules */
 /*--------------*/
 
+.stitch
+{
+	border: 1px solid black;
+	padding: 5px;
+	background: #9999FF;
+}
+
+.stitch-is-selected
+{
+	background: #FF99CC;	
+}
+
+.row
+{
+	padding: 10px 0;
+}
+
+.row-is-selected
+{
+	border: 1px solid black;
+	padding: 10px;
+	background: #66CC99;
+}
 
 /*-------------*/
 /* State Rules */
