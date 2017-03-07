@@ -29,6 +29,7 @@ var slip = Stitch(1, 1, "S");
 var yarnover = Stitch(1, 0, "YO");
 var knittogether = (count) => Stitch(1, count,knit.stitchCode + count + "T");
 var purltogether = (count) => Stitch(1, count,purl.stitchCode + count + "T");
+var emptyStitch = Stitch(0, 0, "-");
 
 
 
