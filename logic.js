@@ -33,7 +33,7 @@ var emptyStitch = Stitch(0, 0, "-");
 
 
 
-function Repeat(stitch, repCount, stitchCode = stitch.stitchCode + repCount)
+function Repeat(stitch = emptyStitch, repCount = 1, stitchCode = stitch.stitchCode + repCount)
 {
 	var newCompoundStitch = Stitch(stitch.stitchesAdded * repCount,
 				  		   stitch.stitchesDropped * repCount,
@@ -44,16 +44,61 @@ function Repeat(stitch, repCount, stitchCode = stitch.stitchCode + repCount)
 
 // TODO: accept a list of arguments; use spread
 // TODO: let instead of var?
-function Sequence(stitch1, stitch2)
+function Sequence(contents = [])
 {
-	var addedBySequence = stitch1.stitchesAdded + stitch2.stitchesAdded;
-	var droppedBySequence = stitch1.stitchesDropped + stitch2.stitchesDropped;
+	var sequenceContents = contents;
 
-	var newCompoundStitch = Stitch(addedBySequence,
-								   droppedBySequence,
-								   "(" + stitch1.stitchCode + ", " + stitch2.stitchCode + ")");
+	function AppendStitch(stitch)
+	{
+		sequenceContents.push(stitch);
+	}
 
-	return newCompoundStitch;
+	var PublicAPI =	{
+		sequenceContents: sequenceContents,
+		AppendStitch: AppendStitch
+	}
+
+	Object.defineProperty(PublicAPI, "isStitchOp",
+		{
+			value: true,
+			writable: false,
+			configurable: false,
+			enumerable: true
+		});
+
+	Object.defineProperty(PublicAPI, "canBeNested",
+		{
+			value: true,
+			writable: false,
+			configurable: false,
+			enumerable: true
+		});
+
+	Object.defineProperty(PublicAPI, "stitchCode",
+		{
+			get: () => "(" + sequenceContents.map(st => st.stitchCode).join() + ")",
+			enumerable: true
+		});
+
+	Object.defineProperty(PublicAPI, "stitchesAdded",
+		{
+			get: () => sequenceContents.reduce(
+							(result, current) => result + current.stitchesAdded,
+							0),
+			enumerable: true
+		});
+
+	Object.defineProperty(PublicAPI, "stitchesDropped",
+		{
+			get: () => sequenceContents.reduce(
+							(result, current) => result + current.stitchesDropped,
+							0),
+			enumerable: true
+		});
+
+
+
+	return PublicAPI;
 }
 
 
