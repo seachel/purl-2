@@ -97,7 +97,6 @@ function Sequence(contents = [])
 		});
 
 
-
 	return PublicAPI;
 }
 
@@ -263,6 +262,7 @@ function GetCastOnValue()
 
 var currentPattern;
 var currentRowIndex = -1;
+//var currentStitch;
 
 // -------------
 // Update Model:
@@ -292,14 +292,46 @@ function AddStitchToDisplay(stitch)
 
 	var newStitchNode = htmlNodeForStitch(stitch);
 
-	var previousStitchCount = document.querySelectorAll('#row-' + currentRowIndex + ' .stitch').length;
+	var stitchOps = document.querySelectorAll('.stitch-is-stitchop');
 
-	if (previousStitchCount > 0)
+	if (stitchOps.length > 0)
 	{
-		currentRowNode.append(",");
+		stitchOps.forEach(
+			function(st)
+			{
+				if (st.classList.contains('stitch-is-selected'))
+				{
+					st.appendChild(newStitchNode);
+				}
+			});
+		//selectedStitches.forEach(st => st.AddStitch(st));
+		
+			//currentStitch.AddStitch(stitch); //add to model
+	}
+	else
+	{
+		var previousStitchCount = document.querySelectorAll('#row-' + currentRowIndex + ' .stitch').length;
+
+		if (previousStitchCount > 0)
+		{
+			currentRowNode.append(",");
+		}
+
+		// TODO: if a stitch is selected, add the new one to the selected stitch OR replace it
+		//			otherwise, add to the end of the current row
+
+		currentRowNode.appendChild(newStitchNode);
 	}
 
-	currentRowNode.appendChild(newStitchNode);
+	var selectedStitches = document.querySelectorAll('.stitch-is-selected');
+
+	if (selectedStitches.length > 0)
+	{
+		selectedStitches.forEach(st => st.classList.toggle("stitch-is-selected"));
+	}
+
+	newStitchNode.classList.add("stitch-is-selected");
+	//currentStitch = newStitchNode;
 
 	UpdateDisplay();
 }
