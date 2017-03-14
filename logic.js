@@ -46,16 +46,16 @@ function Repeat(stitch = emptyStitch, repCount = 1, stitchCode = stitch.stitchCo
 // TODO: let instead of var?
 function Sequence(contents = [])
 {
-	var sequenceContents = contents;
+	var contents = contents;
 
-	function AppendStitch(stitch)
+	function NewStitch(stitch)
 	{
-		sequenceContents.push(stitch);
+		contents.push(stitch);
 	}
 
 	var PublicAPI =	{
-		sequenceContents: sequenceContents,
-		AppendStitch: AppendStitch
+		contents: contents,
+		NewStitch: NewStitch
 	}
 
 	Object.defineProperty(PublicAPI, "isStitchOp",
@@ -76,13 +76,13 @@ function Sequence(contents = [])
 
 	Object.defineProperty(PublicAPI, "stitchCode",
 		{
-			get: () => "(" + sequenceContents.map(st => st.stitchCode).join() + ")",
+			get: () => "(" + contents.map(st => st.stitchCode).join() + ")",
 			enumerable: true
 		});
 
 	Object.defineProperty(PublicAPI, "stitchesAdded",
 		{
-			get: () => sequenceContents.reduce(
+			get: () => contents.reduce(
 							(result, current) => result + current.stitchesAdded,
 							0),
 			enumerable: true
@@ -90,7 +90,7 @@ function Sequence(contents = [])
 
 	Object.defineProperty(PublicAPI, "stitchesDropped",
 		{
-			get: () => sequenceContents.reduce(
+			get: () => contents.reduce(
 							(result, current) => result + current.stitchesDropped,
 							0),
 			enumerable: true
@@ -262,7 +262,7 @@ function GetCastOnValue()
 
 var currentPattern;
 var currentRowIndex = -1;
-//var currentStitch;
+var currentStitch;
 
 // -------------
 // Update Model:
@@ -270,8 +270,14 @@ var currentRowIndex = -1;
 
 function AddStitchToModel(stitch)
 {
-	// current stitch?
-	getCurrentRow().AddStitch(stitch);
+	if (currentStitch && currentStitch.isStitchOp)
+	{
+		currentStitch.NewStitch(stitch);
+	}
+	else
+	{	
+		getCurrentRow().AddStitch(stitch);
+	}
 }
 
 function AddRowToModel(row)
@@ -288,50 +294,57 @@ function AddStitchToDisplay(stitch)
 	// Update current row
 	// Steps: find node for current row, append stitch html
 	// classes for html node?
-	var currentRowNode = document.querySelector('#row-' + currentRowIndex);
 
 	var newStitchNode = htmlNodeForStitch(stitch);
 
-	var stitchOps = document.querySelectorAll('.stitch-is-stitchop');
+	var selectedStitches = document.querySelectorAll('.stitch-is-selected');
 
-	if (stitchOps.length > 0)
+	if (currentStitch && currentStitch.isStitchOp && selectedStitches.length === 1)
 	{
-		stitchOps.forEach(
-			function(st)
+		var stitchContainer = document.querySelectorAll('.stitch-is-selected .stitch-container');
+
+		if (stitchContainer && stitchContainer.length === 1)
+		{
+			var previousStitchCount = document.querySelectorAll('.stitch-is-selected .stitch').length;
+
+			if (previousStitchCount > 0)
 			{
-				if (st.classList.contains('stitch-is-selected'))
-				{
-					st.appendChild(newStitchNode);
-				}
-			});
-		//selectedStitches.forEach(st => st.AddStitch(st));
-		
-			//currentStitch.AddStitch(stitch); //add to model
+				stitchContainer[0].append(',');	
+			}
+
+			stitchContainer[0].appendChild(newStitchNode);
+		}
 	}
 	else
 	{
-		var previousStitchCount = document.querySelectorAll('#row-' + currentRowIndex + ' .stitch').length;
+		var stitchContainer = document.querySelector('#row-' + currentRowIndex + ' .stitch-container');
 
-		if (previousStitchCount > 0)
+		if (stitchContainer)
 		{
-			currentRowNode.append(",");
+			var previousStitchCount = document.querySelectorAll('#row-' + currentRowIndex + ' .stitch').length;
+
+			if (previousStitchCount > 0)
+			{
+				stitchContainer.append(",");
+			}
+
+			// TODO: if a stitch is selected, add the new one to the selected stitch OR replace it
+			//			otherwise, add to the end of the current row
+
+			stitchContainer.appendChild(newStitchNode);
+		}
+	}
+
+	if (stitch.isStitchOp)
+	{
+		if (selectedStitches.length > 0)
+		{
+			selectedStitches.forEach(st => st.classList.toggle("stitch-is-selected"));
 		}
 
-		// TODO: if a stitch is selected, add the new one to the selected stitch OR replace it
-		//			otherwise, add to the end of the current row
-
-		currentRowNode.appendChild(newStitchNode);
+		newStitchNode.classList.add("stitch-is-selected");
+		currentStitch = stitch;
 	}
-
-	var selectedStitches = document.querySelectorAll('.stitch-is-selected');
-
-	if (selectedStitches.length > 0)
-	{
-		selectedStitches.forEach(st => st.classList.toggle("stitch-is-selected"));
-	}
-
-	newStitchNode.classList.add("stitch-is-selected");
-	//currentStitch = newStitchNode;
 
 	UpdateDisplay();
 }
@@ -401,7 +414,19 @@ function htmlNodeForStitch(stitch)
 	var newNode = document.createElement('span');
 	newNode.classList.add('stitch');
 
-	newNode.innerHTML = stitch.stitchCode;
+	if (stitch.isStitchOp)
+	{
+		var stitchContainer = document.createElement('span');
+		stitchContainer.classList.add('stitch-container');
+
+		newNode.append("(");
+		newNode.appendChild(stitchContainer);
+		newNode.append(")");
+	}
+	else
+	{
+		newNode.innerHTML = stitch.stitchCode;
+	}
 
 	return newNode;
 }
@@ -411,7 +436,13 @@ function htmlNodeForRow(row)
 	var newNode = document.createElement('div');
 	newNode.id = "row-" + currentRowIndex;
 	newNode.classList.add('row');
-	newNode.innerHTML = "Row " + (currentRowIndex + 1) + ": " + row.stitches.join();
+
+	var stitchContainer = document.createElement('span');
+	stitchContainer.classList.add('stitch-container');
+	stitchContainer.innerHTML = row.stitches.join();
+
+	newNode.innerHTML = "Row " + (currentRowIndex + 1) + ": ";
+	newNode.appendChild(stitchContainer);
 	
 	return newNode;
 }
@@ -585,6 +616,13 @@ document.onreadystatechange = function(e)
 		if (btn_stitchKnit2together)
 		{
 			btn_stitchKnit2together.addEventListener('click', () => UI_AddStitch(knittogether(2)));
+		}
+
+		var btn_stitchOpSequence = document.querySelector('#btn_stitchop-sequence');
+
+		if (btn_stitchOpSequence)
+		{
+			btn_stitchOpSequence.addEventListener('click', () => UI_AddStitch(Sequence()));	
 		}
 	}
 }

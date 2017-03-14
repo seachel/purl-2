@@ -56,6 +56,18 @@ body
 	background: #FF99CC;	
 }
 
+.stitch-is-stitchop
+{
+	background: yellow;
+}
+
+.stitch-container
+{
+	background: green;
+	padding: 5px;
+	margin: 5px;
+}
+
 .row
 {
 	padding: 10px 0;
