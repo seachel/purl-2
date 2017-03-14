@@ -42,7 +42,6 @@ function Repeat(stitch = emptyStitch, repCount = 1, stitchCode = stitch.stitchCo
 	return newCompoundStitch;
 }
 
-// TODO: accept a list of arguments; use spread
 // TODO: let instead of var?
 function Sequence(contents = [])
 {
@@ -190,13 +189,9 @@ function Pattern(castOnValue) {
 
 	function AddNewRow()
 	{
-		//TODO: some check on row to make sure it is valid?
-		rows.push(Row(this.lastRowWidth));
-	}
+		checkPatternCorrectness();
 
-	function AddError(error)
-	{
-		errors.push(error);
+		rows.push(Row(this.lastRowWidth));
 	}
 
 	function getLastRow()
@@ -204,11 +199,52 @@ function Pattern(castOnValue) {
 		return rows[rows.length - 1]
 	}
 
+	function RemainingStitchesError(stitchesRemaining, rowIndex)
+	{
+		var errorMessage = "Error: " + stitchesRemaining + " stitches remaining in row " + (rowIndex + 1);
+
+		return RowError(errorMessage, rowIndex);
+	}
+
+	function AdjacentRowError(row1StitchesEnd, row1Index, row2StitchesStart)
+	{
+		var errorMessage = "Error: Adjacent row error. " + row1StitchesEnd
+							+ " stitches at the end of row " + (row1Index + 1)
+							+ "and " + row2StitchesStart + " stitches at the start of row "
+							+ (row1Index + 2);
+
+		return RowError(errorMessage, row1Index);
+	}
+
+	function checkPatternCorrectness()
+	{
+		// TODO: will be run whenever a new row is added
+		//	- checks that final number of stitches in row matches the starting number of stitches in the next
+		//		-> true by construction?
+		// - when an error is added, want it to be displayed in the front end
+		for (let rowIndex = 0; rowIndex < rows.length; rowIndex++)
+		{
+			if (rows[rowIndex].stitchesRemaining > 0)
+			{
+				errors.push(RemainingStitchesError(rows[rowIndex].stitchesRemaining, rowIndex));
+			}
+			if (rowIndex + 1 < rows.length)
+			{
+				var currentRowStitchesEnd = rows[rowIndex].stitchesEnd;
+				var nextRowStitchesStart = rows[rowIndex + 1].stitchesStart;
+
+				if (currentRowStitchesEnd !== nextRowStitchesStart)
+				{
+					errors.push(AdjacentRowError(currentRowStitchesEnd, rowIndex, nextRowStitchesStart))
+				}
+			}
+		}
+	}
+
 	var PublicAPI = {
 		rows: rows,
 		AddNewRow: AddNewRow,
-		errors: errors,
-		AddError: AddError
+		errors: errors
 	};
 
 	Object.defineProperty(PublicAPI, "castOnValue",
