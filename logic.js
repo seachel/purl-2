@@ -44,9 +44,9 @@ function Repeat(stitch = emptyStitch, repCount = 1, stitchCode = stitch.stitchCo
 
 // TODO: accept a list of arguments; use spread
 // TODO: let instead of var?
-function Sequence(contents = [])
+function Sequence(initialContents = [])
 {
-	var contents = contents;
+	var contents = initialContents;
 
 	function NewStitch(stitch)
 	{
@@ -188,6 +188,9 @@ function Pattern(castOnValue) {
 	var rows = [];
 	var errors = [];
 
+	// forces size of new row to initially be the 
+	// width of the previous row (at its end)
+	// maybe don't force this? allow arbitrary row to be added?
 	function AddNewRow()
 	{
 		//TODO: some check on row to make sure it is valid?
@@ -240,7 +243,10 @@ function RowError(message, rowIndex = currentRowIndex)
 {
 	var errorMessage = "Error in row " + rowIndex + ": " + message;
 
-	return Error(errorMessage);
+	return {
+		message: message,
+		rowIndex: rowIndex
+	}
 }
 
 

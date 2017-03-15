@@ -35,65 +35,272 @@
 				assert.deepEqual(purltogether_n.stitchesAdded, 1);
 				assert.deepEqual(purltogether_n.stitchesDropped, n);
 				assert.deepEqual(purltogether_n.stitchCode, "P" + n + "T");
-			}	
+			}
 			// TODO: how to say "forall" to test knittogether and purltogether?
+
+			assert.deepEqual(emptyStitch.stitchesAdded, 0);
+			assert.deepEqual(emptyStitch.stitchesDropped, 0);
+			assert.deepEqual(emptyStitch.stitchCode, "-");
 		});
+
 
 	QUnit.test("Repeat Stitches Test",
 		function(assert)
 		{
-			var maxAdded = 10;
-			var maxDropped = 10;
-			var maxRepeat = 15;
+			// sample base stitch
+			var testStitch = Stitch(3, 5, "codeA");
 
-			// need to check all numbers and all stitch codes?
-			for (let testAdded = 0; testAdded <= maxAdded; testAdded++)
-			{
-				for (let testDropped = 0; testDropped <= maxDropped; testDropped++)
-				{
-					var testStitch = Stitch(testAdded, testDropped);
-					
-					for (let repeatCount = 0; repeatCount <= maxRepeat; repeatCount++)
-					{
-						var repeatStitch = Repeat(testStitch, repeatCount);
+			var repeatCount1 = 10;
+			var repeatCount2 = 5;
+
+			// single layer repeat
+			var repeatStitch = Repeat(testStitch, repeatCount1);
 			
-						assert.deepEqual(repeatStitch.stitchesAdded, testStitch.stitchesAdded * repeatCount);
-						assert.deepEqual(repeatStitch.stitchesDropped, testStitch.stitchesDropped * repeatCount);
-						assert.deepEqual(repeatStitch.stitchCode, testStitch.stitchCode + repeatCount);
-					}
-				}
-			}
+			assert.deepEqual(repeatStitch.stitchesAdded, testStitch.stitchesAdded * repeatCount1);
+			assert.deepEqual(repeatStitch.stitchesDropped, testStitch.stitchesDropped * repeatCount1);
+			assert.deepEqual(repeatStitch.stitchCode, testStitch.stitchCode + repeatCount1);
+
+			// double layer repeat
+			var nestedRepeatStitch = Repeat(Repeat(testStitch, repeatCount1), repeatCount2);
+
+			assert.deepEqual(nestedRepeatStitch.stitchesAdded,
+							testStitch.stitchesAdded * repeatCount1 * repeatCount2);
+			assert.deepEqual(nestedRepeatStitch.stitchesDropped,
+							testStitch.stitchesDropped * repeatCount1 * repeatCount2);
+			assert.deepEqual(nestedRepeatStitch.stitchCode,
+							"(" + testStitch.stitchCode + repeatCount1 + ")" + repeatCount2);						
 		});
 
+
+
+	// Sequence tests:
+	//		- call with array of contents
+	//		- call with no arguments
+	//		- test NewStitch (that when called on a stitch, that stitch is added to the contents array)
+	//		- test stitchCode getter (should be outer parentheses with inner comma-separated)
+	//		- test stitchesAdded getter (should be sum of added by parts)
+	//		- test stitchesDropped getter (should be sum of dropped by parts)
+
+	// Passing stitch arguments, the following cases:
+	//		- "base" stitch (use Stitch with any numbers)
+	//		- nested sequence
+	//		- nested repeat
+	//		- double nested sequence
+	//		- double nested repeat
+	//		- repeat in sequence
+	//		- sequence in repeat
 	QUnit.test("Stitch Sequence Test",
 		function(assert)
 		{
-			var maxAddedStitch1 = 10;
-			var maxDroppedStitch1 = 10;
-			var maxAddedStitch2 = 10;
-			var maxDroppedStitch2 = 10;
+			// sample base stitches
+			var stitchA = Stitch(3, 5, "codeA");
+			var stitchB = Stitch(7, 11, "codeB");
+			var stitchC = Stitch(2, 13, "codeC");
 
-			var stitchesAdded1 = maxAddedStitch1;
-			var stitchesDropped1 = maxDroppedStitch1;
-			var stitchCode1 = "code1"; //TODO: go through all codes?
+			var stitchSequence = Sequence([stitchB, stitchC]);
 
-			var stitch1 = Stitch(stitchesAdded1, stitchesDropped1, stitchCode1);
+			// sequence
+			assert.deepEqual(Sequence([stitchA, stitchB]).stitchesAdded,
+				stitchA.stitchesAdded + stitchB.stitchesAdded);
+			assert.deepEqual(Sequence([stitchA, stitchB]).stitchesDropped,
+				stitchA.stitchesDropped + stitchB.stitchesDropped);
+			assert.deepEqual(Sequence([stitchA, stitchB]).stitchCode,
+				"(" + stitchA.stitchCode + "," + stitchB.stitchCode + ")");
 
-			var stitchesAdded2 = maxAddedStitch2;
-			var stitchesDropped2 = maxDroppedStitch2;
-			var stitchCode2 = "code2"; //TODO: go through all codes?
+			// sequence in sequence
+			var stitchSequence = Sequence([stitchB, stitchC]);
 
-			var stitch2 = Stitch(stitchesAdded2, stitchesDropped2, stitchCode2);
+			assert.deepEqual(Sequence([stitchA, stitchSequence]).stitchesAdded,
+				stitchA.stitchesAdded + stitchSequence.stitchesAdded);
+			assert.deepEqual(Sequence([stitchA, stitchSequence]).stitchesDropped,
+				stitchA.stitchesDropped + stitchSequence.stitchesDropped);
+			assert.deepEqual(Sequence([stitchA, stitchSequence]).stitchCode,
+				"(" + stitchA.stitchCode + "," + stitchSequence.stitchCode + ")");
 
-			var stitchSequence = Sequence(stitch1, stitch2);
-			
-			assert.deepEqual(stitchSequence.stitchesAdded,
-							stitch1.stitchesAdded + stitch2.stitchesAdded);
-			assert.deepEqual(stitchSequence.stitchesDropped,
-							stitch1.stitchesDropped + stitch2.stitchesDropped);
-			assert.deepEqual(stitchSequence.stitchCode,
-							"(" + stitch1.stitchCode + ", " + stitch2.stitchCode + ")");
+			// sequence with contents added after
+			var stitchSequence_post = Sequence();
+			stitchSequence_post.NewStitch(stitchB);
+			stitchSequence_post.NewStitch(stitchC);
+
+			assert.deepEqual(stitchSequence_post.stitchesAdded,
+				stitchB.stitchesAdded + stitchC.stitchesAdded);
+			assert.deepEqual(stitchSequence_post.stitchesDropped,
+				stitchB.stitchesDropped + stitchC.stitchesDropped);
+			assert.deepEqual(stitchSequence_post.stitchCode,
+				"(" + stitchB.stitchCode + "," + stitchC.stitchCode + ")");
+
+			// nested sequence same as flattened sequence
+			var nestedSequence = Sequence([stitchA, Sequence([stitchB, stitchC])]);
+			var flattenedSequence = Sequence([stitchA, stitchB, stitchC]);
+
+			assert.deepEqual(nestedSequence.stitchesAdded,
+				flattenedSequence.stitchesAdded);
+			assert.deepEqual(nestedSequence.stitchesDropped,
+				flattenedSequence.stitchesDropped);
+
+			// test NewStitch function
+			var newSequence = Sequence();
+			var initialChildrenCount = newSequence.contents.length;
+
+			newSequence.NewStitch(stitchA);
+
+			var finalChildrenCount = newSequence.contents.length;
+
+			assert.deepEqual(finalChildrenCount, initialChildrenCount + 1);
+
+			if (finalChildrenCount > 0)
+			{
+				assert.deepEqual(newSequence.contents[finalChildrenCount - 1], stitchA);
+			}
 		});
+
+	QUnit.test("Stitch Sequence and Repeat Interaction",
+		function(assert)
+		{
+			// sample base stitches
+			var stitchA = Stitch(3, 5, "codeA");
+			var stitchB = Stitch(7, 11, "codeB");
+
+			var repeatCount1 = 2;
+			var repeatCount2 = 13;
+
+			var stitchSequence = Sequence([stitchA, stitchB]);
+			var stitchRepeat = Repeat(stitchA, repeatCount1);
+
+			// repeat (of base stitch) in sequence
+			assert.deepEqual(Sequence([stitchRepeat, stitchA]).stitchesAdded,
+				stitchRepeat.stitchesAdded + stitchA.stitchesAdded);
+			assert.deepEqual(Sequence([stitchRepeat, stitchA]).stitchesDropped,
+				stitchRepeat.stitchesDropped + stitchA.stitchesDropped);
+			assert.deepEqual(Sequence([stitchRepeat, stitchA]).stitchCode,
+				"(" + stitchRepeat.stitchCode + "," + stitchA.stitchCode + ")");
+
+			// sequence in repeat
+			assert.deepEqual(Repeat(stitchSequence, repeatCount2).stitchesAdded,
+				stitchSequence.stitchesAdded * repeatCount2);
+			assert.deepEqual(Repeat(stitchSequence, repeatCount2).stitchesDropped,
+				stitchSequence.stitchesDropped * repeatCount2);
+			assert.deepEqual(Repeat(stitchSequence, repeatCount2).stitchCode,
+				stitchSequence.stitchCode + repeatCount2);
+		});
+
+	// TODO: row tests
+	QUnit.test("Row Tests",
+		function(assert)
+		{
+			// TODO: how to test rows? equal and not equal?
+			//
+			// test properties of rows: stitchesStart, stitchesEnd, stitchesRemaining
+			// test row functions getTotalStitchesAdded, getTotalStitchesDropped
+			//	- each of these for different cases on the contents of a row
+			//	- single base stitch
+			//	- single sequence
+			//	- single fixed repeat
+			//	- single undetermined repeat (requires more testing/cases)
+			//	- all of the things in a list
+
+			var stitchesStartA = 100;
+
+			var stitchA = Stitch(5, 7, "codeA");
+			var stitchB = Stitch(3, 2, "codeB");
+			var stitchC = Stitch(13, 11, "codeC");
+
+			var repeatCount = 4;
+
+			var stitchSequence = Sequence([stitchB, stitchC]);
+			var stitchRepeat = Repeat(stitchA, repeatCount);
+
+			// base stitch, sequence, and repeat
+			var row1 = Row(stitchesStartA);
+			row1.AddStitch(stitchA);
+			row1.AddStitch(stitchSequence);
+			row1.AddStitch(stitchRepeat);
+
+			assert.deepEqual(row1.stitchesStart, stitchesStartA);
+			assert.deepEqual(row1.stitchesEnd,
+				stitchA.stitchesAdded
+				+ stitchSequence.stitchesAdded
+				+ stitchRepeat.stitchesAdded);
+			assert.deepEqual(row1.stitchesRemaining,
+				row1.stitchesStart
+				- stitchA.stitchesDropped
+				- stitchSequence.stitchesDropped
+				- stitchRepeat.stitchesDropped);
+
+			// sequence equals adding stitches
+			var row2 = Row(stitchesStartA);
+			row2.AddStitch(Sequence([stitchA, stitchB]));
+
+			var row3 = Row(stitchesStartA);
+			row3.AddStitch(stitchA);
+			row3.AddStitch(stitchB);
+
+			assert.deepEqual(row2.stitchesStart, row3.stitchesStart);
+			assert.deepEqual(row2.stitchesRemaining, row3.stitchesRemaining);
+			assert.deepEqual(row2.stitchesEnd, row3.stitchesEnd);
+
+
+			// test AddStitch function
+			var rowAddStitch = Row(stitchesStartA);
+
+			var initStitchCount = rowAddStitch.stitches.length;
+
+			rowAddStitch.AddStitch(stitchA);
+
+			var finalStitchCount = rowAddStitch.stitches.length;
+
+			assert.deepEqual(finalStitchCount, initStitchCount + 1);
+			assert.deepEqual(rowAddStitch.stitches[finalStitchCount - 1], stitchA);
+		});
+
+	// TODO: undetermined repeat tests
+
+	// TODO: undetermined repeat, sequence, fixed repeat interaction test
+
+	QUnit.test("Pattern Tests",
+		function(assert)
+		{
+			var castOnValue = 100;
+
+			var stitchA = Stitch(5, 7, "codeA");
+			var stitchB = Stitch(3, 2, "codeB");
+			var stitchC = Stitch(13, 11, "codeC");
+
+			var row1 = Row(castOnValue);
+			row1.AddStitch(stitchA);
+			row1.AddStitch(stitchB);
+			row1.AddStitch(stitchC);
+
+			// test cast-on value
+			var pattern1 = Pattern(castOnValue);
+
+			assert.deepEqual(pattern1.castOnValue, castOnValue);
+
+
+			// test AddNewRow
+			var initRowsCount = pattern1.rows.length;
+
+			pattern1.AddNewRow();
+
+			var finalRowsCount = pattern1.rows.length;
+
+			assert.deepEqual(finalRowsCount, initRowsCount + 1);
+
+			// test of lastRowWidth, modifying last row
+			var lastRow = pattern1.rows[finalRowsCount - 1];
+			lastRow.AddStitch(stitchA);
+			lastRow.AddStitch(stitchB);
+			lastRow.AddStitch(stitchC);
+
+			assert.deepEqual(pattern1.lastRowWidth, lastRow.stitchesEnd);
+			assert.deepEqual(pattern1.rows[finalRowsCount - 1], lastRow);
+
+			// TODO: test checkPatternCorrectness 
+			// - test for remaining stitches error and adjacent row error,
+			// 		- for each, one case where error should be generated and one where it shouldn't
+			// - add rows to pattern, modify them, check that appropriate errors generates
+			// - how to look up errors? by index?
+		})
 
 	
 	</script>
