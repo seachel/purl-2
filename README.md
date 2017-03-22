@@ -14,6 +14,10 @@ This work builds on a project I completed in a compiler's course in the winter o
 
 I am in the process of writing some documents about knitting, knitting patterns, and checking that knitting patterns are correct. I plan to post these on Medium. I will post links here when they are ready.
 
+## Terminology
+
+TODO
+
 ## Examples:
 
 In its current state all pattern elements are used using buttons on the screen. Open index.html in your browser to begin. We will walk through building an example pattern.
