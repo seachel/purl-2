@@ -35,11 +35,44 @@ var emptyStitch = Stitch(0, 0, "-");
 
 function Repeat(stitch = emptyStitch, repCount = 1, stitchCode = stitch.stitchCode + repCount)
 {
-	var newCompoundStitch = Stitch(stitch.stitchesAdded * repCount,
-				  		   stitch.stitchesDropped * repCount,
-				  		   stitchCode)
+	var newStitchCode = stitchCode;
 
-	return newCompoundStitch;
+	if (stitch.isRepeat)
+	{
+		newStitchCode = "(" + stitch.stitchCode + ")" + repCount;
+	}
+
+	var PublicAPI = {
+		stitchesAdded: stitch.stitchesAdded * repCount,
+		stitchesDropped: stitch.stitchesDropped * repCount,
+		stitchCode: newStitchCode
+	}
+
+	Object.defineProperty(PublicAPI, "isStitchOp",
+		{
+			value: true,
+			writable: false,
+			configurable: false,
+			enumerable: true
+		});
+
+	Object.defineProperty(PublicAPI, "isRepeat",
+		{
+			value: true,
+			writable: false,
+			configurable: false,
+			enumerable: true
+		});
+
+	Object.defineProperty(PublicAPI, "canBeNested",
+		{
+			value: true,
+			writable: false,
+			configurable: false,
+			enumerable: true
+		});
+
+	return PublicAPI;
 }
 
 // TODO: accept a list of arguments; use spread
@@ -59,6 +92,14 @@ function Sequence(initialContents = [])
 	}
 
 	Object.defineProperty(PublicAPI, "isStitchOp",
+		{
+			value: true,
+			writable: false,
+			configurable: false,
+			enumerable: true
+		});
+
+	Object.defineProperty(PublicAPI, "isSequence",
 		{
 			value: true,
 			writable: false,
@@ -101,29 +142,54 @@ function Sequence(initialContents = [])
 }
 
 
+function NatNumberDivide(dividend, divisor)
+{
+	var quotient = 0;
+	var remainder = 0;
+
+	if (divisor > 0)
+	{
+		while (divisor * quotient + remainder < dividend)
+		{
+			if (divisor * (quotient + 1) + remainder <= dividend)
+			{
+				quotient++;
+			}
+			else
+			{
+				remainder++;
+			}
+		}
+	}
+
+	// check for error if divisor * quotient + remainder > dividend?
+	// use aspectJS for postcondition?
+
+	return {
+		quotient: quotient,
+		remainder: remainder
+	}
+}
+
+
 function Row(stitchesStart)
 {
+	
 	// TODO: use proper division and remainder functions
 	function UndeterminedRepeat(stitch)
 	{
-		var divisor = 0;
-		var remainder = stitchesRemaining;
+		var divisor = stitch.stitchesDropped;
+		var dividend = stitchesRemaining;
 
-		if (remainder >= stitch.stitchesDropped)
-		{
-			while (remainder >= stitch.stitchesDropped)
-			{
-				remainder -= stitch.stitchesDropped;
-				divisor++;
-			}		
-		}
-		else
+		if (divisor <= 0 || dividend < 0)
 		{
 			// TODO: need error to break everything... and different error if things are falsy due to being undefined
 			console.log("ABORT! ABORT! cannot perform undetermined repeat!");
 		}
 
-		var newCompoundStitch = Repeat(stitch, divisor, "*" + stitch.stitchCode + "*");
+		var quotient = NatNumberDivide(dividend, divisor).quotient;
+
+		var newCompoundStitch = Repeat(stitch, quotient, "*" + stitch.stitchCode + "*");
 
 		return newCompoundStitch;
 	}
@@ -259,7 +325,7 @@ function RowError(message, rowIndex = currentRowIndex)
 function GetCastOnValue()
 {
 	// require that this input is numeric, and function returns a number
-	return Number(document.querySelector('#cast-on-input').innerHTML);
+	return Number(document.querySelector('#cast-on-input').value);
 }
 
 

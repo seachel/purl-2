@@ -302,6 +302,20 @@
 			// - how to look up errors? by index?
 		})
 
+	QUnit.test("Utility functions",
+		function(assert)
+		{
+			for (let a = 0; a <= 1000; a++)
+			{
+				for (let b = 1; b <= 10; b++)
+				{
+					var divRes = NatNumberDivide(a, b);
+
+					assert.deepEqual(a, b * divRes.quotient + divRes.remainder);
+				}
+			}
+		});
+
 	
 	</script>
 </head>
