@@ -8,7 +8,7 @@ Not all of the standards are precisely defined, so we take some liberties with t
 - *K*
 Here we will go with the third option, but all seem equally valid according to the CYC standard which says * represents "repeat instructions following the single asterisk as directed".
 
-This work builds on a project I completed in a compiler's course in the winter of 2014 during my undergraduate degree. The final report for that project can be found [here](https://128.84.21.199/abs/1606.08708?context=cs.PL).
+This work builds on a project I completed in a compiler's course in the winter of 2014 during my undergraduate degree. The goal of that project was to compile a language for knitting patterns that included pattern modules to the expanded standard notation, with some basic correctness checking. The final report for that project can be found [here](https://128.84.21.199/abs/1606.08708?context=cs.PL).
 
 ## Description:
 
@@ -16,7 +16,17 @@ I am in the process of writing some documents about knitting, knitting patterns,
 
 ## Examples:
 
-TODO
+In its current state all pattern elements are used using buttons on the screen. Open index.html in your browser to begin. We will walk through building an example pattern.
+
+1. Enter a value for the number of stitches to be cast on (or leave the default value). This will be the number of stitches initially available for the first row.
+
+2. Press the _New Pattern_ button. This creates a pattern object with the specified cast on value.
+
+3. Add a new row to the pattern by pressing _New Row_.
+
+4. To add a stitch to this row, press any of the stitch buttons.
+
+(TODO: will be expanded with a complete example, explaining the correctness checks in the background?)
 
 ## Development:
 
