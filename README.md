@@ -3,10 +3,10 @@
 The goal of this project is to provide an easy-to-use interface for defining correct knitting patterns. The patterns are written in the standard text format outlined by the Craft Yarn Council: [knitting abbreviations](http://www.craftyarncouncil.com/knit.html).
 
 Not all of the standards are precisely defined, so we take some liberties with the Purl pattern language. For example, an undetermined repeat (repeat as many times as possible to the end of the row) of a knit stitch is commonly written the following ways:
-- *K; to the end of the row
-- *K;
-- *K*
-Here we will go with the third option, but all seem equally valid according to the CYC standard which says * represents "repeat instructions following the single asterisk as directed".
+- \*K; to the end of the row
+- \*K;
+- \*K\*
+Here we will go with the third option, but all seem equally valid according to the CYC standard which says \* represents "repeat instructions following the single asterisk as directed".
 
 This work builds on a project I completed in a compiler's course in the winter of 2014 during my undergraduate degree. The goal of that project was to compile a language for knitting patterns that included pattern modules to the expanded standard notation, with some basic correctness checking. The final report for that project can be found [here](https://128.84.21.199/abs/1606.08708?context=cs.PL).
 
