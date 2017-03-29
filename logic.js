@@ -338,14 +338,21 @@ function checkPatternCorrectness(pattern)
 	// - when an error is added, want it to be displayed in the front end
 	if (pattern)
 	{
+		pattern.errors = [];
+
 		for (let rowIndex = 0; rowIndex < pattern.rows.length; rowIndex++)
 		{
-			if (pattern.rows[rowIndex].stitchesRemaining < 0)
+			var overuseOfStitchesInRow = pattern.rows[rowIndex].stitchesRemaining < 0;
+
+			if (overuseOfStitchesInRow)
 			{
 				pattern.errors.push(OverusedStitchesError(pattern.rows[rowIndex].stitchesRemaining, rowIndex));
 			}
 
-			if (rowIndex + 1 < pattern.rows.length)
+
+			var notFinalRow = rowIndex + 1 < pattern.rows.length
+
+			if (notFinalRow)
 			{
 				var currentRowStitchesEnd = pattern.rows[rowIndex].stitchesEnd;
 				var nextRowStitchesStart = pattern.rows[rowIndex + 1].stitchesStart;
@@ -634,6 +641,21 @@ function ClearErrorDisplay()
 	}
 }
 
+function CheckPatternAndUpdateErrors()
+{
+	ClearErrorDisplay();
+	
+	checkPatternCorrectness(currentPattern);
+	var errorListElement = document.querySelector("#pattern-errors");
+
+	currentPattern.errors.forEach(
+		function (err)
+		{
+			var errorNode = htmlNodeForError(err);
+			errorListElement.appendChild(errorNode);
+		});
+}
+
 
 // ---------------
 // Event Handlers:
@@ -648,16 +670,7 @@ function UI_AddStitch(stitch)
 			AddStitchToModel(stitch);
 			AddStitchToDisplay(stitch);
 	
-			checkPatternCorrectness(currentPattern);
-			var errorListElement = document.querySelector("#pattern-errors");
-
-			currentPattern.errors.forEach(
-				function (err)
-				{
-					var errorNode = htmlNodeForError(err);
-					errorListElement.appendChild(errorNode);
-				});
-			//errorListElement.innerHTML = currentPattern.errors.map(e => e.message);
+			CheckPatternAndUpdateErrors();
 		}
 		else
 		{
@@ -683,9 +696,7 @@ function UI_AddNewRow()
 		AddRowToModel(newRow);
 		AddRowToDisplay(newRow);
 
-		checkPatternCorrectness(currentPattern);
-		var errorElement = document.querySelector("#pattern-errors");
-		errorElement.innerHTML = currentPattern.errors.map(e => e.message);
+		CheckPatternAndUpdateErrors();
 	}
 	else
 	{
