@@ -75,7 +75,6 @@ function Repeat(stitch = emptyStitch, repCount = 1, stitchCode = stitch.stitchCo
 	return PublicAPI;
 }
 
-// TODO: accept a list of arguments; use spread
 // TODO: let instead of var?
 function Sequence(initialContents = [])
 {
@@ -259,13 +258,9 @@ function Pattern(castOnValue) {
 	// maybe don't force this? allow arbitrary row to be added?
 	function AddNewRow()
 	{
-		//TODO: some check on row to make sure it is valid?
-		rows.push(Row(this.lastRowWidth));
-	}
+		checkPatternCorrectness();
 
-	function AddError(error)
-	{
-		errors.push(error);
+		rows.push(Row(this.lastRowWidth));
 	}
 
 	function getLastRow()
@@ -273,11 +268,11 @@ function Pattern(castOnValue) {
 		return rows[rows.length - 1]
 	}
 
+
 	var PublicAPI = {
 		rows: rows,
 		AddNewRow: AddNewRow,
-		errors: errors,
-		AddError: AddError
+		errors: errors
 	};
 
 	Object.defineProperty(PublicAPI, "castOnValue",
@@ -298,20 +293,84 @@ function Pattern(castOnValue) {
 }
 
 
-function Error(message)
+// ------------------------------------------------------
+// Correctness
+// ------------------------------------------------------
+function checkPatternCorrectness(pattern)
 {
-	return {
-		message: message,
+	function RowError(message, rowIndex = currentRowIndex)
+	{
+		var errorMessage = "Error in row " + rowIndex + ": " + message;
+
+		return {
+			message: errorMessage,
+			rowIndex: rowIndex
+		};
 	}
-}
 
-function RowError(message, rowIndex = currentRowIndex)
-{
-	var errorMessage = "Error in row " + rowIndex + ": " + message;
+	function OverusedStitchesError(stitchesRemaining, rowIndex)
+	{
+		var errorMessage = "Overuse of stitches - " + stitchesRemaining + " stitches remaining in row " + (rowIndex + 1);
 
-	return {
-		message: message,
-		rowIndex: rowIndex
+		return RowError(errorMessage, rowIndex);
+	}
+
+	function RemainingStitchesError(stitchesRemaining, rowIndex)
+	{
+		var errorMessage = "Unused stitches - " + stitchesRemaining + " stitches remaining in row " + (rowIndex + 1);
+
+		return RowError(errorMessage, rowIndex);
+	}
+
+	function AdjacentRowError(row1StitchesEnd, row1Index, row2StitchesStart)
+	{
+		var errorMessage = "Adjacent row stitch count mismatch - " + row1StitchesEnd
+							+ " stitches at the end of row " + (row1Index + 1)
+							+ "and " + row2StitchesStart + " stitches at the start of row "
+							+ (row1Index + 2);
+
+		return RowError(errorMessage, row1Index);
+	}
+
+	// TODO: will be run whenever a new row is added
+	//	- checks that final number of stitches in row matches the starting number of stitches in the next
+	//		-> true by construction?
+	// - when an error is added, want it to be displayed in the front end
+	if (pattern)
+	{
+		for (let rowIndex = 0; rowIndex < pattern.rows.length; rowIndex++)
+		{
+			if (pattern.rows[rowIndex].stitchesRemaining < 0)
+			{
+				pattern.errors.push(OverusedStitchesError(pattern.rows[rowIndex].stitchesRemaining, rowIndex));
+			}
+
+			if (rowIndex + 1 < pattern.rows.length)
+			{
+				var currentRowStitchesEnd = pattern.rows[rowIndex].stitchesEnd;
+				var nextRowStitchesStart = pattern.rows[rowIndex + 1].stitchesStart;
+
+				if (currentRowStitchesEnd !== nextRowStitchesStart)
+				{
+					pattern.errors.push(AdjacentRowError(currentRowStitchesEnd, rowIndex, nextRowStitchesStart))
+				}
+			}
+
+			if (rowIndex < pattern.rows.length && rowIndex !== currentRowIndex)
+			{
+				var currentRowStitchesRemaining = pattern.rows[rowIndex].stitchesRemaining;
+
+				if (currentRowStitchesRemaining > 0)
+				{
+					pattern.errors.push(RemainingStitchesError(currentRowStitchesRemaining, rowIndex));
+				}
+			}
+		}
+	}
+	else
+	{
+		// TODO: program error... checking correctness of undefined pattern
+		console.log("Pattern passed to correctness check is " + pattern);
 	}
 }
 
@@ -545,19 +604,7 @@ function AddError(errorMessage)
 	AddErrorToDisplay(newError);
 }
 
-function AddRowError(errorMessage)
-{
-	var newError = RowError(errorMessage, currentRowIndex + 1);
-
-	AddErrorToModel(newError);
-	AddErrorToDisplay(newError);
-}
-
-function AddErrorToModel(error)
-{
-	currentPattern.AddError(error);
-}
-
+// Necessary?
 function AddErrorToDisplay(error)
 {
 	var newNode = htmlNodeForError(error);
@@ -574,6 +621,7 @@ function htmlNodeForError(error)
 	return newNode;
 }
 
+// necessary?
 function ClearErrorDisplay()
 {
 	var errorDisplayNode = document.querySelector("#pattern-errors");
@@ -593,40 +641,55 @@ function ClearErrorDisplay()
 
 function UI_AddStitch(stitch)
 {
-	if (currentRowIndex >= 0)
+	if (currentPattern)
 	{
-		if (stitch.stitchesDropped <= getCurrentRow().stitchesRemaining)
+		if (currentRowIndex >= 0)
 		{
 			AddStitchToModel(stitch);
 			AddStitchToDisplay(stitch);
+	
+			checkPatternCorrectness(currentPattern);
+			var errorElement = document.querySelector("#pattern-errors");
+			errorElement.innerHTML = currentPattern.errors.map(e => e.message);
 		}
 		else
 		{
-			var errorMessage = "Can't add stitch " + stitch.stitchCode + " to row; need " + stitch.stitchesDropped + " stitches but only " + getCurrentRow().stitchesRemaining + " stitches remaining.";
-
-			AddRowError(errorMessage);
+			// Should have a different kind of error... UI error? should currentRowIndex always be nonneg?
+			console.log("No rows in pattern; can't add stitch " + stitch + " to current row.");
 		}
 	}
 	else
 	{
-		AddError("No rows in pattern; can't add stitch " + stitch + " to current row.");
+		// TODO: user error... no current pattern
+		console.log("No current pattern.");
 	}
 }
 
 function UI_AddNewRow()
 {
-	var newRow = Row(currentPattern.lastRowWidth);
+	if (currentPattern)
+	{
+		var newRow = Row(currentPattern.lastRowWidth);
+	
+		currentRowIndex++;
+	
+		AddRowToModel(newRow);
+		AddRowToDisplay(newRow);
 
-	currentRowIndex++;
-
-	AddRowToModel(newRow);
-	AddRowToDisplay(newRow);
+		checkPatternCorrectness(currentPattern);
+		var errorElement = document.querySelector("#pattern-errors");
+		errorElement.innerHTML = currentPattern.errors.map(e => e.message);
+	}
+	else
+	{
+		// TODO: user error... no current pattern
+		console.log("No current pattern.");
+	}
 }
 
 function UI_NewPattern()
 {
 	ClearPatternDisplay();
-	ClearErrorDisplay();
 
 	var newPattern = Pattern(GetCastOnValue());
 
