@@ -300,7 +300,7 @@ function checkPatternCorrectness(pattern)
 {
 	function RowError(message, rowIndex = currentRowIndex)
 	{
-		var errorMessage = "Error in row " + rowIndex + ": " + message;
+		var errorMessage = "(Error) " + message;
 
 		return {
 			message: errorMessage,
@@ -308,16 +308,20 @@ function checkPatternCorrectness(pattern)
 		};
 	}
 
-	function OverusedStitchesError(stitchesRemaining, rowIndex)
+	function OverusedStitchesError(stitchOveruse, rowIndex)
 	{
-		var errorMessage = "Overuse of stitches - " + stitchesRemaining + " stitches remaining in row " + (rowIndex + 1);
+		var stitchOrStitches = (stitchOveruse === 1) ? "stitch" : "stitches";
+		var errorMessage = "Overuse of stitches: " + stitchOveruse + " more " + stitchOrStitches
+							+ " required in row " + (rowIndex + 1);
 
 		return RowError(errorMessage, rowIndex);
 	}
 
 	function RemainingStitchesError(stitchesRemaining, rowIndex)
 	{
-		var errorMessage = "Unused stitches - " + stitchesRemaining + " stitches remaining in row " + (rowIndex + 1);
+		var stitchOrStitches = (stitchesRemaining === 1) ? "stitch" : "stitches";
+		var errorMessage = "Unused stitches: " + stitchesRemaining + " " + stitchOrStitches
+							+ " remaining in row " + (rowIndex + 1);
 
 		return RowError(errorMessage, rowIndex);
 	}
@@ -346,7 +350,9 @@ function checkPatternCorrectness(pattern)
 
 			if (overuseOfStitchesInRow)
 			{
-				pattern.errors.push(OverusedStitchesError(pattern.rows[rowIndex].stitchesRemaining, rowIndex));
+				var stitchOveruse = pattern.rows[rowIndex].stitchesRemaining * (-1);
+
+				pattern.errors.push(OverusedStitchesError(stitchOveruse, rowIndex));
 			}
 
 
@@ -644,7 +650,7 @@ function ClearErrorDisplay()
 function CheckPatternAndUpdateErrors()
 {
 	ClearErrorDisplay();
-	
+
 	checkPatternCorrectness(currentPattern);
 	var errorListElement = document.querySelector("#pattern-errors");
 
