@@ -2,15 +2,21 @@
 /* Base Rules */
 /*------------*/
 
+html, body
+{
+	padding: 0px;
+	margin: 0px;
+	height: 100%;
+}
+
 body
 {
 	/*font-family: 'Arsenal', sans-serif;*/
 	font-family: 'Slabo 27px', serif;
 	/*font-family: 'Playfair Display', serif;*/
 	font-size: 24px;
-	padding: 0px;
-	margin: 0px;
 }
+
 
 
 /*--------------*/
@@ -20,24 +26,75 @@ body
 #header
 {
 	padding: 10px 0;
+	font-size: 30px;
 	font-family: 'Lobster Two', cursive;
 	font-weight: normal;
 	text-align: center;
+	vertical-align: middle;
+	line-height: 50px;
+	height: 50px;
 }
 
-#main-content
+#content-container
 {
-	max-width: 800px;
-	margin: auto;
-	font-family: 'Slabo 27px', serif;
-	font-size: 24px;
+	display: flex;
+	height: 92%;
+	border: 2px solid gray;
+	/*background-color: yellow;*/
 }
 
-.l-panel
+#pattern-data
 {
-	padding: 10px 0;
+	width: 20%;
+	min-width: 150px;
+	padding: 10px;
+	border-right: 2px solid gray;
+	/*background-color: green;*/
 }
 
+#output-container
+{
+	display: flex;
+	flex-direction: column;
+	width: 60%;
+	min-width: 500px;
+	min-height: 300px;
+	padding: 10px;
+	/*background-color: red;*/
+}
+
+#pattern-display
+{
+	height: 60%;
+	min-height: 300px;
+	margin: 10px;
+	/*background-color: gray;*/
+}
+
+#pattern-errors
+{
+	height: 40%;
+	margin: 10px;
+	padding: 10px;
+	border: 2px solid gray;
+	/*background-color: purple;*/
+}
+
+#pattern-controls
+{
+	width: 20%;
+	min-width: 75px;
+	padding: 10px;
+	border-left: 2px solid gray;
+	/*background-color: blue;*/
+}
+
+#controls-container
+{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
 
 /*--------------*/
 /* Module Rules */
@@ -78,6 +135,35 @@ body
 	border: 1px solid black;
 	padding: 10px;
 	background: #66CC99;
+}
+
+.control-button {
+  background: #c7c7c7;
+  background-image: -webkit-linear-gradient(top, #c7c7c7, #e8e8e8);
+  background-image: -moz-linear-gradient(top, #c7c7c7, #e8e8e8);
+  background-image: -ms-linear-gradient(top, #c7c7c7, #e8e8e8);
+  background-image: -o-linear-gradient(top, #c7c7c7, #e8e8e8);
+  background-image: linear-gradient(to bottom, #c7c7c7, #e8e8e8);
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0px;
+  color: #525252;
+  font-size: 20px;
+  padding: 10px 20px 10px 20px;
+  text-decoration: none;
+  margin-top: 5px;
+  width: 50%;
+
+}
+
+.control-button:hover {
+  background: #ecd8fc;
+  background-image: -webkit-linear-gradient(top, #ecd8fc, #b19ec9);
+  background-image: -moz-linear-gradient(top, #ecd8fc, #b19ec9);
+  background-image: -ms-linear-gradient(top, #ecd8fc, #b19ec9);
+  background-image: -o-linear-gradient(top, #ecd8fc, #b19ec9);
+  background-image: linear-gradient(to bottom, #ecd8fc, #b19ec9);
+  text-decoration: none;
 }
 
 /*-------------*/

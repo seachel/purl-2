@@ -16,69 +16,77 @@
 </head>
 <body>
 
-<div id="header"></div>
-
-<div id="main-content">
-
-<div class="l-information is-hidden">
-
-<p>
-A stitch is either a base stitch or a stitch operator. A stitch operator is some form of compound stitch; given some stitches as argument, it returns a new "stitch". Stitch operators include:
-
-<li>sequences, written stitch1, stitch2, ..., stitchn, meaning knit stitch1, then stitch2, then ..., then stitchn</li>
-<li>fixed repeat, written (stitch) number, meaning knit stitch number times</li>
-<li>undetermined repeat, written *stitch*, meaning knit stitch as many times as possible to the end of the row</li>
-</p>
-
+<div id="header">
+Purl Knitting Pattern Designer
 </div>
 
+<div id="content-container">
 
-<div id="pattern-controls">
+	<div id="pattern-data">
 
-<div>Cast on value: <input id="cast-on-input" value="6" /></div>
+		<div class="l-information is-hidden">
 
-<input id="btn_new-pattern" type="button" value="New Pattern">
-<input id="btn_add-row" type="button" value="Add Row">
-<input id="btn_stitch-knit" type="button" value="K">
-<input id="btn_stitch-purl" type="button" value="P">
-<input id="btn_stitch-yarnover" type="button" value="YO">
-<input id="btn_stitch-knit2together" type="button" value="K2T">
-<input id="btn_stitchop-sequence" type="button" value="(_ , _)">
+			<p>
+			A stitch is either a base stitch or a stitch operator. A stitch operator is some form of compound stitch; given some stitches as argument, it returns a new "stitch". Stitch operators include:
+
+			<li>sequences, written stitch1, stitch2, ..., stitchn, meaning knit stitch1, then stitch2, then ..., then stitchn</li>
+			<li>fixed repeat, written (stitch) number, meaning knit stitch number times</li>
+			<li>undetermined repeat, written *stitch*, meaning knit stitch as many times as possible to the end of the row</li>
+			</p>
+
+		</div>
+
+
+		<div>
+			Current row data:
+		</div>
+		<div>
+			Stitches at start: <span id="row-stitches-start"></span>
+		</div>
+		<div>
+			Stitches remaining: <span id="row-stitches-remaining"></span>
+		</div>
+		<div>
+			Stitches at end: <span id="row-stitches-end"></span>
+		</div>
+
+	</div>
+
+	<div id="output-container">
+		Pattern:
+		<div id="pattern-display" class="l-panel">
+
+		</div>
+
+		Errors:
+		<div id="pattern-errors" class="l-panel">
+
+		</div>
+	</div>
+
+
+	<div id="pattern-controls">
+
+		<div id="controls-container">
+			<div>Cast-on value: <span id="cast-on-input" contenteditable="true">6</span></div>
+
+			<input id="btn_new-pattern" class="control-button" type="button" value="New Pattern">
+			<input id="btn_add-row" class="control-button" type="button" value="Add Row">
+			<input id="btn_stitch-knit" class="control-button" type="button" value="K">
+			<input id="btn_stitch-purl" class="control-button" type="button" value="P">
+			<input id="btn_stitch-yarnover" class="control-button" type="button" value="YO">
+			<input id="btn_stitch-knit2together" class="control-button" type="button" value="K2T">
+			<input id="btn_stitchop-sequence" class="control-button" type="button" value="(_ , _)">
+		</div>
+	</div>
+
+
+
+
+</div>
 </div>
 
-
-<div id="pattern-data">
-
-<div>
-	Current row data:
 </div>
-<div>
-	Stitches at start: <span id="row-stitches-start"></span>
-</div>
-<div>
-	Stitches remaining: <span id="row-stitches-remaining"></span>
-</div>
-<div>
-	Stitches at end: <span id="row-stitches-end"></span>
-</div>
-
-<br>
-
-<div id="pattern-display" class="l-panel">
-
-</div>
-
-
-<div id="pattern-errors" class="l-panel">
-
-</div>
-
-
-
-
-</div>
-</div>
-
 
 </body>
 </html>
