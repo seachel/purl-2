@@ -649,8 +649,15 @@ function UI_AddStitch(stitch)
 			AddStitchToDisplay(stitch);
 	
 			checkPatternCorrectness(currentPattern);
-			var errorElement = document.querySelector("#pattern-errors");
-			errorElement.innerHTML = currentPattern.errors.map(e => e.message);
+			var errorListElement = document.querySelector("#pattern-errors");
+
+			currentPattern.errors.forEach(
+				function (err)
+				{
+					var errorNode = htmlNodeForError(err);
+					errorListElement.appendChild(errorNode);
+				});
+			//errorListElement.innerHTML = currentPattern.errors.map(e => e.message);
 		}
 		else
 		{
