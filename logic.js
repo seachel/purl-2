@@ -25,20 +25,6 @@ function Stitch(stitchesAdded, stitchesDropped, stitchCode="no-code")
 	PublicAPI.stitchID = "stitch-" + sessionStitchCounter;
 	sessionStitchCounter++;
 
-	// Object.defineProperty(PublicAPI, "stitchID",
-	// {
-	// 	set: function(val)
-	// 		{
-	// 			this._stitchID_ = val;
-	// 			sessionStitchCounter++;
-	// 		},
-	// 	get: function()
-	// 		{
-	// 			return this._stitchID_;
-	// 		},
-	// 	enumerable: true
-	// });
-
 	return PublicAPI;
 }
 
@@ -65,17 +51,17 @@ function yarnover()
 
 function knittogether(count)
 {
-	Stitch(1, count,knit().stitchCode + count + "T");
+	return Stitch(1, count,knit().stitchCode + count + "T");
 }
 
 function purltogether(count)
 {
-	Stitch(1, count,purl().stitchCode + count + "T");
+	return Stitch(1, count,purl().stitchCode + count + "T");
 }
 
 function emptyStitch()
 {
-	Stitch(0, 0, "-");
+	return Stitch(0, 0, "-");
 }
 
 
@@ -548,7 +534,7 @@ function AddStitchToDisplay(stitch)
 		currentStitch = stitch;
 	}
 
-	UpdateDisplay();
+	UpdateDataDisplay();
 }
 
 function AddRowToDisplay(row)
@@ -558,7 +544,7 @@ function AddRowToDisplay(row)
 
 	document.querySelector("#pattern-display").appendChild(newNode);
 
-	UpdateDisplay();
+	UpdateDataDisplay();
 }
 
 function AddCurrentPatternToDisplay()
@@ -567,7 +553,7 @@ function AddCurrentPatternToDisplay()
 
 	document.querySelector("#pattern-display").appendChild(newNode);
 
-	UpdateDisplay();
+	UpdateDataDisplay();
 }
 
 function ClearPatternDisplay()
@@ -583,7 +569,7 @@ function ClearPatternDisplay()
 	currentRowIndex = -1;
 }
 
-function UpdateDisplay()
+function UpdateDataDisplay()
 {
 	// TEMP display, will change as UI changes
 	if (currentRowIndex >= 0)
@@ -782,6 +768,24 @@ function UI_NewPattern()
 	AddCurrentPatternToDisplay();
 }
 
+function RemoveStitch(stitchNode)
+{
+	for (let rowIndex = 0; rowIndex < currentPattern.rows.length; rowIndex++)
+	{
+		for (let stIndex = 0; stIndex < currentPattern.rows[rowIndex].stitches.length; stIndex++)
+		{
+			var focusStitch = currentPattern.rows[rowIndex].stitches[stIndex];
+			if (focusStitch.stitchID === stitchNode.id)
+			{
+				currentPattern.rows[rowIndex].stitches.splice(stIndex, 1);
+				stitchNode.remove();
+			}
+		}
+	}
+
+	CheckPatternAndUpdateErrors();
+	UpdateDataDisplay();
+}
 
 function onKeyUp(e)
 {
@@ -799,19 +803,7 @@ function onKeyUp(e)
 		{
 			case 8: 	// backspace
 			case 46: 	// delete
-				for (let rowIndex = 0; rowIndex < currentPattern.rows.length; rowIndex++)
-				{
-					for (let stIndex = 0; stIndex < currentPattern.rows[rowIndex].stitches.length; stIndex++)
-					{
-						var focusStitch = currentPattern.rows[rowIndex].stitches[stIndex];
-						if (focusStitch.stitchID === selectedStitchNode.id)
-						{
-							currentPattern.rows[rowIndex].stitches.splice(stIndex, 1);
-						}
-					}
-				}
-
-				CheckPatternAndUpdateErrors();
+				RemoveStitch(selectedStitchNode);
 				break;
 			case 13: 	// enter 
 				break;
