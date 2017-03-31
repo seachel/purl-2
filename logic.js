@@ -509,12 +509,12 @@ function AddStitchToDisplay(stitch)
 
 		if (stitchContainer)
 		{
-			var previousStitchCount = document.querySelectorAll('#row-' + currentRowIndex + ' .stitch').length;
+			// var previousStitchCount = document.querySelectorAll('#row-' + currentRowIndex + ' .stitch').length;
 
-			if (previousStitchCount > 0)
-			{
-				stitchContainer.append(",");
-			}
+			// if (previousStitchCount > 0)
+			// {
+			// 	stitchContainer.append(",");
+			// }
 
 			// TODO: if a stitch is selected, add the new one to the selected stitch OR replace it
 			//			otherwise, add to the end of the current row
