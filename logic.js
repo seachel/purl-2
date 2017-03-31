@@ -308,15 +308,17 @@ function checkPatternCorrectness(pattern)
 		};
 	}
 
+	// Error for when too many stitches in a row are used
 	function OverusedStitchesError(stitchOveruse, rowIndex)
 	{
 		var stitchOrStitches = (stitchOveruse === 1) ? "stitch" : "stitches";
 		var errorMessage = "Overuse of stitches: " + stitchOveruse + " more " + stitchOrStitches
-							+ " required in row " + (rowIndex + 1);
+							+ " used than available in row " + (rowIndex + 1);
 
 		return RowError(errorMessage, rowIndex);
 	}
 
+	// Error for when not all stitches of a row are used
 	function RemainingStitchesError(stitchesRemaining, rowIndex)
 	{
 		var stitchOrStitches = (stitchesRemaining === 1) ? "stitch" : "stitches";
@@ -326,6 +328,8 @@ function checkPatternCorrectness(pattern)
 		return RowError(errorMessage, rowIndex);
 	}
 
+	// This error should not occur with the current GUI;
+	// by construction consecutive rows have same number for stitches at the end of the first and stitches at the start of the second.
 	function AdjacentRowError(row1StitchesEnd, row1Index, row2StitchesStart)
 	{
 		var errorMessage = "Adjacent row stitch count mismatch - " + row1StitchesEnd
@@ -336,10 +340,7 @@ function checkPatternCorrectness(pattern)
 		return RowError(errorMessage, row1Index);
 	}
 
-	// TODO: will be run whenever a new row is added
-	//	- checks that final number of stitches in row matches the starting number of stitches in the next
-	//		-> true by construction?
-	// - when an error is added, want it to be displayed in the front end
+	// Should be run whenever a new row or stitch is added to the specified pattern
 	if (pattern)
 	{
 		pattern.errors = [];
@@ -402,11 +403,12 @@ function GetCastOnValue()
 
 
 
-// Temp State:
+// Program State:
 
 var currentPattern;
 var currentRowIndex = -1;
 var currentStitch;
+
 
 // -------------
 // Update Model:
@@ -429,16 +431,13 @@ function AddRowToModel(row)
 	currentPattern.AddNewRow(row);
 }
 
+
 // ---------------
 // Update Display:
 // ---------------
 
 function AddStitchToDisplay(stitch)
 {
-	// Update current row
-	// Steps: find node for current row, append stitch html
-	// classes for html node?
-
 	var newStitchNode = htmlNodeForStitch(stitch);
 
 	var selectedStitches = document.querySelectorAll('.stitch-is-selected');
