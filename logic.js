@@ -16,22 +16,70 @@
 
 function Stitch(stitchesAdded, stitchesDropped, stitchCode="no-code")
 {
-	return {
+	var PublicAPI = {
 		stitchesAdded: stitchesAdded, // ensure this is a nat
 		stitchesDropped: stitchesDropped, // ensure this is a nat
-		stitchCode: stitchCode // ensure this is a string
+		stitchCode: stitchCode, // ensure this is a string
 	};
+
+	PublicAPI.stitchID = "stitch-" + sessionStitchCounter;
+	sessionStitchCounter++;
+
+	// Object.defineProperty(PublicAPI, "stitchID",
+	// {
+	// 	set: function(val)
+	// 		{
+	// 			this._stitchID_ = val;
+	// 			sessionStitchCounter++;
+	// 		},
+	// 	get: function()
+	// 		{
+	// 			return this._stitchID_;
+	// 		},
+	// 	enumerable: true
+	// });
+
+	return PublicAPI;
 }
 
-var knit = Stitch(1, 1, "K");
-var purl = Stitch(1, 1, "P");
-var slip = Stitch(1, 1, "S");
-var yarnover = Stitch(1, 0, "YO");
-var knittogether = (count) => Stitch(1, count,knit.stitchCode + count + "T");
-var purltogether = (count) => Stitch(1, count,purl.stitchCode + count + "T");
-var emptyStitch = Stitch(0, 0, "-");
+//var knit = new Stitch(1, 1, "K");
+function knit()
+{
+	return Stitch(1, 1, "K");
+}
+
+function purl()
+{
+	return Stitch(1, 1, "P");
+}
+
+function slip()
+{
+	return Stitch(1, 1, "S");
+}
+
+function yarnover()
+{
+	return Stitch(1, 0, "YO");	
+}
+
+function knittogether(count)
+{
+	Stitch(1, count,knit().stitchCode + count + "T");
+}
+
+function purltogether(count)
+{
+	Stitch(1, count,purl().stitchCode + count + "T");
+}
+
+function emptyStitch()
+{
+	Stitch(0, 0, "-");
+}
 
 
+var sessionStitchCounter = 0;
 
 function Repeat(stitch = emptyStitch, repCount = 1, stitchCode = stitch.stitchCode + repCount)
 {
@@ -436,9 +484,20 @@ function AddRowToModel(row)
 // Update Display:
 // ---------------
 
+function SelectStitch(stitchNode)
+{
+	var selectedStitches = document.querySelectorAll('.stitch-is-selected');
+
+	selectedStitches.forEach(st => st.classList.remove('stitch-is-selected'));
+
+	stitchNode.classList.add('stitch-is-selected');
+}
+
+
 function AddStitchToDisplay(stitch)
 {
 	var newStitchNode = htmlNodeForStitch(stitch);
+	newStitchNode.addEventListener('click', () => SelectStitch(newStitchNode));
 
 	var selectedStitches = document.querySelectorAll('.stitch-is-selected');
 
@@ -556,6 +615,7 @@ function htmlNodeForStitch(stitch)
 {
 	var newNode = document.createElement('span');
 	newNode.classList.add('stitch');
+	newNode.id = stitch.stitchID;
 
 	if (stitch.isStitchOp)
 	{
@@ -723,15 +783,54 @@ function UI_NewPattern()
 }
 
 
+function onKeyUp(e)
+{
+	// TODO:
+	// get selected stitch if any and do appropriate thing based on key press
+	// need to get parent too?
+	var selectedStitches = document.querySelectorAll('.stitch-is-selected');
+	// TODO: better way to make sure only one stitch selected?
+
+	if (selectedStitches.length === 1)
+	{
+		var selectedStitchNode = selectedStitches[0];
+
+		switch (e.keyCode)
+		{
+			case 8: 	// backspace
+			case 46: 	// delete
+				for (let rowIndex = 0; rowIndex < currentPattern.rows.length; rowIndex++)
+				{
+					for (let stIndex = 0; stIndex < currentPattern.rows[rowIndex].stitches.length; stIndex++)
+					{
+						var focusStitch = currentPattern.rows[rowIndex].stitches[stIndex];
+						if (focusStitch.stitchID === selectedStitchNode.id)
+						{
+							currentPattern.rows[rowIndex].stitches.splice(stIndex, 1);
+						}
+					}
+				}
+
+				CheckPatternAndUpdateErrors();
+				break;
+			case 13: 	// enter 
+				break;
+			case 9: 	// tab
+			case 39: 	// right arrow
+				break;
+			case 37: 	// left arrow
+				break;
+		}
+	}
+}
+
+
 // TODO: how to test when elements from original page are null here?
 document.onreadystatechange = function(e)
 {
     if (document.readyState === 'complete')
     {
-    	// TODO: different behaviour for different pages?
-
-    	// Initialize temp state for testing
-    	//currentPattern = Pattern(GetCastOnValue());
+    	document.addEventListener('keyup', onKeyUp);
 
     	var btn_newPattern = document.querySelector('#btn_new-pattern');
 
@@ -752,21 +851,21 @@ document.onreadystatechange = function(e)
 
     	if (btn_stitchKnit)
     	{
-    		btn_stitchKnit.addEventListener('click', () => UI_AddStitch(knit));
+    		btn_stitchKnit.addEventListener('click', () => UI_AddStitch(knit()));
 		}
 
 		var btn_stitchPurl = document.querySelector('#btn_stitch-purl');
 
 		if (btn_stitchPurl)
 		{
-			btn_stitchPurl.addEventListener('click', () => UI_AddStitch(purl));
+			btn_stitchPurl.addEventListener('click', () => UI_AddStitch(purl()));
 		}
 
 		var btn_stitchYarnover = document.querySelector('#btn_stitch-yarnover');
 
 		if (btn_stitchYarnover)
 		{
-			btn_stitchYarnover.addEventListener('click', () => UI_AddStitch(yarnover));
+			btn_stitchYarnover.addEventListener('click', () => UI_AddStitch(yarnover()));
 		}
 
 		var btn_stitchKnit2together = document.querySelector('#btn_stitch-knit2together');
