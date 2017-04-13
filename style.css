@@ -104,18 +104,13 @@ body
 {
 	border: 1px solid black;
 	padding: 5px;
-	margin: 2px;
+	margin: 5px;
 	background: #9999FF;
 }
 
 .stitch-is-selected
 {
 	background: #FF99CC;	
-}
-
-.stitch-is-stitchop
-{
-	background: yellow;
 }
 
 .stitch-container

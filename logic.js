@@ -493,12 +493,12 @@ function AddStitchToDisplay(stitch)
 
 		if (stitchContainer && stitchContainer.length === 1)
 		{
-			var previousStitchCount = document.querySelectorAll('.stitch-is-selected .stitch').length;
+			// var previousStitchCount = document.querySelectorAll('.stitch-is-selected .stitch').length;
 
-			if (previousStitchCount > 0)
-			{
-				stitchContainer[0].append(',');	
-			}
+			// if (previousStitchCount > 0)
+			// {
+			// 	stitchContainer[0].append(',');	
+			// }
 
 			stitchContainer[0].appendChild(newStitchNode);
 		}
@@ -779,12 +779,21 @@ function RemoveStitch(stitchNode)
 			{
 				currentPattern.rows[rowIndex].stitches.splice(stIndex, 1);
 				stitchNode.remove();
+
+				// TODO: select stitch to left? previous sibling stitch?
 			}
 		}
 	}
 
 	CheckPatternAndUpdateErrors();
 	UpdateDataDisplay();
+}
+
+function UnselectStitch()
+{
+	var selectedStitchNodes = document.querySelectorAll('.stitch-is-selected');
+
+	selectedStitchNodes.forEach(st => st.classList.remove('stitch-is-selected'));
 }
 
 function onKeyUp(e)
@@ -811,6 +820,9 @@ function onKeyUp(e)
 			case 39: 	// right arrow
 				break;
 			case 37: 	// left arrow
+				break;
+			case 27: 	// escape
+				UnselectStitch();
 				break;
 		}
 	}
